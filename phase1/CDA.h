@@ -83,7 +83,7 @@ class CDA
         int _start;
         bool _reverse;
 
-        T _validreference = static_cast<T>(0);
+        //T _validreference = dynamic_cast<T>(0);
 
         /* Extend array if needed */
         void Extend();

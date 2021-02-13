@@ -37,18 +37,29 @@ int main() {
 	printCDA(B);
 	cout << " = [1 2 3 4 5 6 7 8 9 10 11 12 13 14 15]" << endl << endl;
 	
-	for (int i = 15; i > 3; i--) B.DelFront();
+	for (int i = 15; i > 3; i--) 
+	{
+		B.DelFront();
+		//printCDA(B);
+		//cout << endl;
+	}
 	cout << "Halving capacity: " << B.Length() << " = 3, " << B.Capacity() << " = 8" << endl << endl;
 
 	A.Clear();
 	cout << "Clear: " << A.Length() << " = 0, " << A.Capacity() << " = 4" << endl << endl;
 
+	//cout << "HERE" << endl << endl << endl;
+
 	A.AddEnd(0);
+	//printCDA(A);
+
 	for (int i = 1; i <= 5; i++) {
 		A.AddEnd(i);
 		A.AddFront(-i);
 		A.Reverse();
 	}
+	//printCDA(A);
+
 	A.DelEnd(); A.DelFront(); A.AddEnd(10); A.Reverse(); A.DelEnd(); 
 	cout << "Reversing: ";
 	printCDA(A);
@@ -78,6 +89,8 @@ int main() {
 
 	cout << "Select: " << C.Select(8) << " = 15, " << C.Select(6) << " = 12, " << C[1] << " = 4" << endl << endl;
 
+	//C.Print();
+
 	cout << "Search: " << C.Search(3) << " = 5, " << C.Search(5) << " = -1" << endl << endl;
 	
 	C.Sort();
@@ -101,6 +114,6 @@ int main() {
 	cout << " = [cat caterpillar dog elephant lion mouse]" << endl << endl;
 
 	cout << "Binary Search with strings: " << D.BinSearch("cat") << " = 0, " << D.BinSearch("frog") << " = " << ~(4) << ", " << D.BinSearch("zebra") << " = " << ~(6) << endl;
-
+	
 	return 0;
 }

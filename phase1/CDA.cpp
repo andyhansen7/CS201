@@ -9,7 +9,7 @@
 #include "CDA.h"
 #include <iostream>
 #include <stdlib.h>
-#include <string>
+//#include <string>
 
 //#define _DEBUG_
 
@@ -17,6 +17,7 @@ template<typename T>
 CDA<T>::CDA()
     : _size(0), _capacity(1), _start(0), _reverse(false)
 {
+    //_array = new T[_capacity];
     _array = new T[_capacity];
 
     //DebugLog("Array created with default constuctors");
@@ -78,21 +79,23 @@ T& CDA<T>::operator[](int index)
         std::cout << "[ERROR] Invalid index specified" << std::endl;
 
         // return a cast value so that there are never errors
-        return _validreference;
+        //return _validreference;
+        //return nullptr;
+        return _array[0];
     }
 
     // Access element in opposite direction
     if(_reverse) {  
 
-        ////DebugLog("Array index " + std::to_string(index) + " accessed in reverse order, returning value of index " + std::to_string((_capacity + _start - index) % _capacity));
+        //DebugLog("Array index " + std::to_string(index) + " accessed in reverse order, returning value of index " + std::to_string((_capacity + _start - index) % _capacity));
         
-        return _array[(_capacity + _start + _size - index - 1) % _capacity];
+        return _array[(_start + _size - index - 1) % _capacity];
     }
 
     // Access array normally
     else {  
 
-        ////DebugLog("Array index " + std::to_string(index) + " accessed in normal order, returning value of index " + std::to_string(index));
+        //DebugLog("Array index " + std::to_string(index) + " accessed in normal order, returning value of index " + std::to_string(index));
 
         return _array[(_capacity + _start + index) % _capacity];
     }
@@ -141,14 +144,26 @@ int CDA<T>::Capacity()
 template <typename T>
 void CDA<T>::Clear()
 {
-    delete[] _array;
-
+    //T* oldarr = _array;
     _array = new T[4];
+
+    //std::cout << "HERE" << std::endl;
+
+    //T* newarr = new T[4];
+
+    //std::cout << "1" << std::endl;
+    //_array = newarr;
+    //std::cout << "2" << std::endl;
+
     _size = 0;
     _capacity = 4;
     _start = 0;
 
-    //DebugLog("Array cleared");
+    //std::cout << "3" << std::endl;
+
+    //delete [] oldarr;
+
+    ////DebugLog("Array cleared");
 }
 
 template <typename T>
@@ -162,7 +177,17 @@ void CDA<T>::Reverse()
 template <typename T>
 T CDA<T>::Select(int k)
 {
-    return QuickSelectRecursive(0, _size - 1, k);
+    // QuickSelect sorts the array. Apparently we don't need it to sort the array. 
+    // Making an array copy to reset it after the search is complete
+    T* backup = new T[_capacity];
+    for(int i = 0; i < _size; i++) backup[(_start + i) % _capacity] = _array[(_start + i) % _capacity];
+
+    T retval = QuickSelectRecursive(0, _size - 1, k);
+
+    delete[] _array;
+    _array = backup;
+
+    return retval;
 }
 
 template <typename T>
@@ -183,18 +208,9 @@ int CDA<T>::Search(T e)
     // Unordered linear search of array for element
     for(int i = 0; i < _size; i++) {
 
-        // find next largest value
-        //if((*this)[i] > e ) {
-        //    if(nextlargest == e || (*this)[i] < nextlargest) nextlargest = (*this)[i];
-        //}
-
-        // compare current value
         if((*this)[i] == e) return i;
     }
 
-    // Only reachable if value is not found
-    //if(nextlargest != e) return ~(static_cast<int>(nextlargest)); 
-    //else return ~_size;
     return -1;
 }
 
@@ -229,8 +245,13 @@ void CDA<T>::Extend()
     if(_size >= _capacity)
     {
         T* newarray = new T[_capacity * 2];
+        int newcap = 2 * _capacity;
+        int newstart = (_start + _capacity) % newcap;
+
+        //std::cout << newcap << "   " << newstart << std::endl; 
 
         // set values to new array
+        /*
         for(int i = 0; i < _size; i++) newarray[i] = (*this)[i];
 
         delete[] _array;
@@ -239,6 +260,21 @@ void CDA<T>::Extend()
         // Reset values
         _start = 0;
         _capacity *= 2;
+        //_reverse = !_reverse;
+        */
+
+        for(int i = 0; i < _size; i++) 
+        {
+            newarray[(newstart + i) % newcap] = _array[(_start + i) % _capacity];
+            //std::cout << newarray[(newstart + i) % newcap] << std::endl;
+        }
+
+        //delete[] _array;
+        _array = newarray;
+
+        _start = newstart;
+        _capacity = newcap;
+
 
         //DebugLog("Capacity expanded to " + std::to_string(_capacity));
     }
@@ -249,8 +285,12 @@ void CDA<T>::Contract()
 {
     if(_size <= (_capacity / 4) && ((_capacity / 2) > 4)) 
     {
+        //std::cout << "CONTRACT" << std::endl;
         T* newarray = new T[_capacity / 2];
+        int newcap = _capacity / 2;
+        int newstart = (_start + _capacity) % newcap;
 
+        /*
         for(int i = 0; i < _size; i++) newarray[i] = (*this)[i];
 
         delete[] _array;
@@ -259,6 +299,20 @@ void CDA<T>::Contract()
         // Reset values
         _start = 0;
         _capacity = _capacity / 2;
+        _reverse = false;
+        */
+
+        for(int i = 0; i < _size; i++) 
+        {
+            newarray[(newstart + i) % newcap] = _array[(_start + i) % _capacity];
+            //std::cout << newarray[(newstart + i) % newcap] << std::endl;
+        }
+
+        //delete[] _array;
+        _array = newarray;
+
+        _start = newstart;
+        _capacity = newcap;
 
         //DebugLog("Capacity contracted to " + std::to_string(_capacity));
     }
@@ -294,7 +348,7 @@ void CDA<T>::InsertEnd(T value)
 template <typename T>
 void CDA<T>::RemoveFront()
 {
-    _array[_start] = _validreference;
+    //_array[_start] = _validreference;
     _start++;
 
     _size--;
@@ -307,7 +361,7 @@ void CDA<T>::RemoveFront()
 template <typename T>
 void CDA<T>::RemoveEnd()
 {
-    _array[(_start + _size) % _capacity] = _validreference;
+    //_array[(_start + _size - 1) % _capacity] = _validreference;
 
     _size--;
 
@@ -436,7 +490,7 @@ T CDA<T>::QuickSelectRecursive(int lower, int upper, int position)
        // if position is less, run it again
        else return QuickSelectRecursive(index + 1, upper, position - index + lower - 1);
    }
-   else return _validreference;
+   else { return 0b00; }//_validreference
 }
 
 template <typename T>

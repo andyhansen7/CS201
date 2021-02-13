@@ -8,6 +8,22 @@ int main()
     // Default constructor test
     CDA<int> A;
 
+    A.AddEnd(3);    // 3
+    A.AddFront(0);  // 0 3
+    A.AddEnd(1);    // 0 3 1
+    A.Print();
+
+    A.DelFront();   // 3 1
+    A.AddFront(2);  // 2 3 1
+    A.AddFront(1);  // 1 2 3 1
+    A.Print();
+
+    A.DelEnd();     // 1 2 3 
+    A.Print();
+    A.AddEnd(4);    // 1 2 3 4
+    A.Print();
+
+    /*
     // Operator testing
     A.AddFront(1);
     A.AddFront(2);
@@ -89,6 +105,7 @@ int main()
     cout << E.Select(1) << endl;    // 8
     cout << E.Select(2) << endl;    // 17
     cout << E.Select(5) << endl;    // 345
+    */
 
 
     return 0;
