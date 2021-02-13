@@ -1,0 +1,9 @@
+# VS Code settings folder
+./vscode
+
+# Executables
+.exe
+
+# Output files
+.o
+
