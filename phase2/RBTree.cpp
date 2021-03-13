@@ -103,13 +103,27 @@ int RBTree::select(int position)
 // Returns pointer to the key following key in the tree, or NULL if none exists
 int* RBTree::successor(int key)
 {
-    return new int(); // TODO
+    Node* search = RecursiveSearch(_root, key);
+
+    if(search == NULL) return new int();
+
+    else {
+        Node* sucessor = SuccessorNode(search);
+        return &(sucessor->key);
+    }
 }
 
 // Returns pointer to the key before key in the tree, or NULL if none exists
 int* RBTree::predecessor(int key)
 {
-    return new int(); // TODO
+    Node* search = RecursiveSearch(_root, key);
+
+    if(search == NULL) return new int();
+
+    else {
+        Node* sucessor = PredecessorNode(search);
+        return &(sucessor->key);
+    }
 }
 
 // Returns size of tree
@@ -304,6 +318,71 @@ void RBTree::RightRotation(Node* node)
     if (node_parent->rightChild != NULL) node_parent->rightChild->parent = node;
  
     node_parent->rightChild = node;
+}
+
+// Helper to get node that will replace node
+Node* RBTree::GetClosest(Node* node)
+{
+    // If node has 2 children
+    if(node->leftChild != NULL && node->rightChild != NULL) return SuccessorNode(node->rightChild);
+ 
+    // If node is leaf node
+    else if(node->leftChild == NULL && node->rightChild == NULL) return NULL;
+ 
+    // Node has only one child
+    else {
+        if(node->leftChild != NULL) return node->leftChild;
+        else return node->rightChild;
+    }
+}
+
+// Successor and predecessor helpers returning reference to a node
+Node* RBTree::PredecessorNode(Node* node)
+{
+    if(node->leftChild != NULL) return RightmostNode(node->leftChild);
+
+    Node* parent = node->parent;
+    Node* temp = node;
+
+    while(parent != NULL && temp == parent->leftChild) {
+        temp = parent;
+        parent = parent->parent;
+    }
+
+    return parent;
+}
+
+Node* RBTree::SuccessorNode(Node* node)
+{
+    if(node->rightChild != NULL) return LeftmostNode(node->rightChild);
+
+    Node* parent = node->parent;
+    Node* temp = node;
+
+    while(parent != NULL && temp == parent->rightChild) {
+        temp = parent;
+        parent = parent->parent;
+    }
+
+    return parent;
+}
+
+Node* RBTree::LeftmostNode(Node* root)
+{
+    Node* temp = root;
+ 
+    while(temp->leftChild != NULL) temp = temp->leftChild;
+ 
+    return temp;
+}
+
+Node* RBTree::RightmostNode(Node* root)
+{
+    Node* temp = root;
+ 
+    while(temp->rightChild != NULL) temp = temp->rightChild;
+ 
+    return temp;
 }
 
 // Preorder print helper

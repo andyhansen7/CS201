@@ -12,7 +12,9 @@ int main()
         t.inorder();
         cout << endl;
     }
-    //cout << endl << t.size() << endl;
+    cout << endl << t.size() << endl;
+    cout << *(t.predecessor(2)) << endl;
+    cout << *(t.successor(6)) << endl;
 
     return 0;
 }

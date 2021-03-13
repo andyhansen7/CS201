@@ -108,6 +108,15 @@ class RBTree
         void LeftRotation(Node* node);
         void RightRotation(Node* node);
 
+        // Helper to get node that will replace node
+        Node* GetClosest(Node* node);
+
+        // Successor and predecessor helpers returning reference to a node
+        Node* PredecessorNode(Node* node);
+        Node* SuccessorNode(Node* node);
+        Node* LeftmostNode(Node* root);
+        Node* RightmostNode(Node* root);
+        
         // Print helpers
         void PreorderRecursive(Node* node);
         void InorderRecursive(Node* node);
