@@ -7,8 +7,11 @@ int main()
 {
     RBTree t;
 
-    for(int i = 0; i < 10; i++) t.insert(i, i);
-    t.inorder();
+    for(int i = 0; i < 10; i++) {
+        t.insert(i, i);
+        t.inorder();
+        cout << endl;
+    }
     //cout << endl << t.size() << endl;
 
     return 0;
