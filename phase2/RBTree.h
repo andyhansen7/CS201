@@ -13,7 +13,7 @@ class Node {
     public:
         int key = 0;
         int value = 0;
-        NodeColor color = NodeColor::BLACK;
+        NodeColor color = NodeColor::RED;
         Node* leftChild = NULL;
         Node* rightChild = NULL;
         Node* parent = NULL;
@@ -22,8 +22,6 @@ class Node {
         {
             if(leftChild != NULL) leftChild->FreeNode();
             if(rightChild != NULL) rightChild->FreeNode();
-
-            
         }
 };
 
@@ -82,6 +80,16 @@ class RBTree
 
         // Recursive search helper
         Node* RecursiveSearch(Node* node, int key);
+
+        // Recursive insert helper
+        void RecursiveInsert(Node* root, Node* newnode);
+
+        // Helper function to fix violations caused by insertion
+        void RecolorTree(Node* newnode);
+
+        // Rotation helpers 
+        void LeftRotation(Node* node);
+        void RightRotation(Node* node);
 
         // Print helpers
         void PreorderRecursive(Node* node);
