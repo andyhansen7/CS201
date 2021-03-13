@@ -234,6 +234,7 @@ void RBTree::RecolorTree(Node* newnode)
     }
 }
 
+// Helper function that returns uncle node
 Node* RBTree::GetUncle(Node* node)
 {
     if(node->parent == NULL || node->parent->parent == NULL) return NULL;
@@ -242,6 +243,7 @@ Node* RBTree::GetUncle(Node* node)
     else return node->parent->parent->leftChild;
 }
 
+// Switches the colors of nodes a and b
 void RBTree::SwitchColors(Node* a, Node* b)
 {
     NodeColor temp = a->color;
@@ -249,19 +251,19 @@ void RBTree::SwitchColors(Node* a, Node* b)
     b->color = temp;
 }
 
+// Shifts node down and inserts parent above it
 void RBTree::ShiftDown(Node* node, Node* node_parent)
 {
     if (node->parent != NULL) {
-      if (IsLeftChild(node)) {
-        node->parent->leftChild = node_parent;
-      } else {
-        node->parent->rightChild = node_parent;
-      }
+        if (IsLeftChild(node)) node->parent->leftChild = node_parent;
+        else node->parent->rightChild = node_parent;
     }
+
     node_parent->parent = node->parent;
     node->parent = node_parent;
-  }
+}
 
+// Macro to determine if node is left child of parent
 bool RBTree::IsLeftChild(Node* node)
 {
     return (node == node->parent->leftChild);

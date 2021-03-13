@@ -91,9 +91,17 @@ class RBTree
 
         // Helper function to fix violations caused by insertion
         void RecolorTree(Node* newnode);
+
+        // Helper function that returns uncle node
         Node* GetUncle(Node* node);
+
+        // Switches the colors of nodes a and b
         void SwitchColors(Node* a, Node* b);
+
+        // Shifts node down and inserts parent above it
         void ShiftDown(Node* node, Node* parent);
+
+        // Macro to determine if node is left child of parent
         bool IsLeftChild(Node* node);
 
         // Rotation helpers 
