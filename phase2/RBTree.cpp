@@ -52,6 +52,11 @@ void RBTree::insert(int key, int value)
         RecursiveInsert(_root, newnode);
         return;
     }
+
+    // Fix violations caused by new node insertion
+    RecolorTree(newnode);
+
+    _size++;
 }
 
 // Removes node with key and returns 1. If key is not found, returns 0
@@ -63,13 +68,30 @@ int RBTree::remove(int key)
 // Returns the rank of key in tree, or 0 if key is not found. 
 int RBTree::rank(int key)
 {
+    // Recursively set ranks of all nodes in tree
+    SetRanks(_root, 0);
 
+    Node* node = RecursiveSearch(_root, key);
+
+    if(node != NULL) return node->rank;
+    else return 0;
 }
 
 // Returns the key of node at position in tree, with 1 being the root
 int RBTree::select(int position)
 {
+    if(position < 1 || position > _size) {
+        std::cout << "[ERROR] Call to select() with position out of bounds." << std::endl;
+        return 0;
+    }
+    else {
+        SetChildrenNumbers(_root);
 
+        Node* node = RecursiveSelect(_root, position);
+
+        if(node != NULL) return node->key;
+        else return 0;
+    }
 }
 
 // Returns pointer to the key following key in the tree, or NULL if none exists
@@ -274,4 +296,34 @@ void RBTree::PostorderRecursive(Node* node)
     PreorderRecursive(node->leftChild);
     PreorderRecursive(node->rightChild);
     std::cout << node->key << " ";
+}
+
+// Recursive function to set ranks
+void RBTree::SetRanks(Node* current, int currentRank) 
+{
+    current->rank = currentRank + 1;
+
+    if(current->rightChild != NULL) SetRanks(current->rightChild, currentRank + 1);
+    if(current->leftChild != NULL) SetRanks(current->leftChild, currentRank + 1);
+}
+
+// Recursive function to set number of children of node
+void RBTree::SetChildrenNumbers(Node* current)
+{
+    // Reset values
+    current->numChildrenLeft = 0;
+    current->numChildrenRight = 0;
+
+    // Recursive calls to children
+    if(current->leftChild != NULL) SetChildrenNumbers(current->leftChild);
+    if(current->rightChild != NULL) SetChildrenNumbers(current->rightChild);
+
+    // Set number for node
+    current->numChildrenLeft = current->leftChild->numChildrenLeft + current->leftChild->numChildrenRight + 1;
+}
+
+// Recursive select helper
+Node* RBTree::RecursiveSelect(Node* current, int position)
+{
+
 }

@@ -13,7 +13,12 @@ class Node {
     public:
         int key = 0;
         int value = 0;
+
         NodeColor color = NodeColor::RED;
+        int rank = 0;
+        int numChildrenLeft = 0;
+        int numChildrenRight = 0;
+
         Node* leftChild = NULL;
         Node* rightChild = NULL;
         Node* parent = NULL;
@@ -95,6 +100,15 @@ class RBTree
         void PreorderRecursive(Node* node);
         void InorderRecursive(Node* node);
         void PostorderRecursive(Node* node);
+
+        // Recursive function to set ranks
+        void SetRanks(Node* current, int currentRank);
+
+        // Recursive function to set number of children of node
+        void SetChildrenNumbers(Node* current);
+
+        // Recursive select helper
+        Node* RecursiveSelect(Node* current, int position);
 };  
 
 #endif //_RBTree_H_
