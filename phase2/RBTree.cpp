@@ -23,7 +23,7 @@ RBTree::RBTree(int keys[], int values[], int s)
 // Destructor
 RBTree::~RBTree()
 {
-
+    std::cout << "Destructor for tree called." << std::endl;
 }
 
 // Traditional search method. Returns pointer to value stored at key
@@ -46,15 +46,18 @@ void RBTree::insert(int key, int value)
     // Tree is empty
     if(_root == NULL) {
         _root = newnode;
-        return;
-    }
-    else {
-        RecursiveInsert(_root, newnode);
-        return;
+        _root->color = NodeColor::BLACK;
     }
 
-    // Fix violations caused by new node insertion
-    RecolorTree(newnode);
+    else {
+        Node* check = RecursiveSearch(_root, key);
+        if(check != NULL) return;
+
+        _root = RecursiveInsert(_root, newnode);
+
+        // Fix violations caused by new node insertion
+        RecolorTree(newnode);
+    }
 
     _size++;
 }
@@ -62,7 +65,7 @@ void RBTree::insert(int key, int value)
 // Removes node with key and returns 1. If key is not found, returns 0
 int RBTree::remove(int key)
 {
-
+    return 0; // TODO
 }
 
 // Returns the rank of key in tree, or 0 if key is not found. 
@@ -97,13 +100,13 @@ int RBTree::select(int position)
 // Returns pointer to the key following key in the tree, or NULL if none exists
 int* RBTree::successor(int key)
 {
-
+    return new int(); // TODO
 }
 
 // Returns pointer to the key before key in the tree, or NULL if none exists
 int* RBTree::predecessor(int key)
 {
-
+    return new int(); // TODO
 }
 
 // Returns size of tree
@@ -115,25 +118,28 @@ int RBTree::size()
 // Prints keys in preorder transversal
 void RBTree::preorder()
 {
+    if(_root == NULL) return;
     PreorderRecursive(_root);
 }
 
 // Prints keys in inorder transversal
 void RBTree::inorder()
 {
+    if(_root == NULL) return;
     InorderRecursive(_root);
 }
 
 // Prints keys in postorder transversal
 void RBTree::postorder()
 {
+    if(_root == NULL) return;
     PostorderRecursive(_root);
 }
         
 // Prints the smallest k keys in the tree
 void RBTree::printk(int k)
 {
-
+    return; // TODO
 }
 
 // Recursive search helper
@@ -148,24 +154,28 @@ Node* RBTree::RecursiveSearch(Node* node, int key)
 }
 
 // Recursive insert helper
-void RBTree::RecursiveInsert(Node* root, Node* newnode)
+Node* RBTree::RecursiveInsert(Node* root, Node* newnode)
 {
+    // Insertion case
+    if(root == NULL) return newnode;
+
     if (newnode->key < root->key) { 
-        RecursiveInsert(root->leftChild, newnode); 
+        root->leftChild = RecursiveInsert(root->leftChild, newnode); 
         root->leftChild->parent = root; 
     } 
     else if (newnode->key > root->key) { 
-        RecursiveInsert(root->rightChild, newnode); 
+        root->rightChild = RecursiveInsert(root->rightChild, newnode); 
         root->rightChild->parent = root; 
     } 
     else {
         std::cout << "[ERROR] Insert called on new node with key already in tree" << std::endl;
-        return;
     } 
+
+    return root;
 }
 
 // Helper function to fix violations caused by insertion
-void RBTree::RecolorTree(Node* newnode)
+/** OLD
 {
     Node* new_parent = NULL;
     Node* new_grandparent = NULL;
@@ -232,40 +242,131 @@ void RBTree::RecolorTree(Node* newnode)
 
     _root->color = NodeColor::BLACK;
 }
+**/
+// if x is root color it black and return
+void RBTree::RecolorTree(Node* newnode)
+{
+    // if x is root color it black and return
+    if (newnode == _root) {
+      newnode->color = NodeColor::BLACK;
+      return;
+    }
+ 
+    // initialize parent, grandparent, uncle
+    Node *parent = newnode->parent, *grandparent = parent->parent,
+         *uncle = GetUncle(newnode);
+ 
+    if (parent->color != NodeColor::BLACK) {
+      if (uncle != NULL && uncle->color == NodeColor::RED) {
+        // uncle red, perform recoloring and recurse
+        parent->color = NodeColor::BLACK;
+        uncle->color = NodeColor::BLACK;
+        grandparent->color = NodeColor::RED;
+        RecolorTree(grandparent);
+      } else {
+        // Else perform LR, LL, RL, RR
+        if (IsLeftChild(parent)) {
+          if (IsLeftChild(newnode)) {
+            // for left right
+            SwitchColors(parent, grandparent);
+          } else {
+            LeftRotation(parent);
+            SwitchColors(newnode, grandparent);
+          }
+          // for left left and left right
+          RightRotation(grandparent);
+        } else {
+          if (IsLeftChild(newnode)) {
+            // for right left
+            RightRotation(parent);
+            SwitchColors(newnode, grandparent);
+          } else {
+            SwitchColors(parent, grandparent);
+          }
+ 
+          // for right right and right left
+          LeftRotation(grandparent);
+        }
+      }
+    }
+}
+
+Node* RBTree::GetUncle(Node* node)
+{
+    if(node->parent == NULL || node->parent->parent == NULL) return NULL;
+
+    if(node->parent == node->parent->parent->leftChild) return node->parent->parent->rightChild;
+    else return node->parent->parent->leftChild;
+}
+
+void RBTree::SwitchColors(Node* a, Node* b)
+{
+    NodeColor temp = a->color;
+    a->color = b->color;
+    b->color = temp;
+}
+
+void RBTree::ShiftDown(Node* node, Node* parent)
+{
+    if(node->parent != NULL) {
+      if (IsLeftChild(node)) {
+        node->parent->leftChild = parent;
+      } else {
+        node->parent->rightChild = parent;
+      }
+    }
+    parent->parent = node->parent;
+    node->parent = parent;
+}
+
+bool RBTree::IsLeftChild(Node* node)
+{
+    return (node == node->parent->leftChild);
+}
 
 // Rotation helpers
 void RBTree::LeftRotation(Node* node)
 {
-    Node* right_child = node->rightChild;
-    node->rightChild = right_child->leftChild;
-
-    if(node->rightChild != NULL) node->rightChild->parent = node;
-
-    right_child->parent = node->parent;
-
-    if(node->parent == NULL) _root = right_child;
-    else if(node == node->parent->leftChild) node->parent->leftChild = right_child;
-    else node->parent->rightChild = right_child;
-
-    right_child->leftChild = node;
-    node->parent = right_child;
+   // new parent will be node's right child
+    Node *nParent = node->rightChild;
+ 
+    // update root if current node is root
+    if (node == _root)
+      _root = nParent;
+ 
+    ShiftDown(node, nParent);
+ 
+    // connect x with new parent's left element
+    node->rightChild = nParent->leftChild;
+    // connect new parent's left element with node
+    // if it is not null
+    if (nParent->leftChild != NULL)
+      nParent->leftChild->parent = node;
+ 
+    // connect new parent with x
+    nParent->leftChild = node;
 }
 
 void RBTree::RightRotation(Node* node)
 {
-    Node* left_child = node->leftChild;
-    node->leftChild = left_child->rightChild;
-
-    if(node->leftChild != NULL) node->rightChild->parent = node;
-
-    left_child->parent = node->parent;
-
-    if(node->parent == NULL) _root = left_child;
-    else if(node == node->parent->leftChild) node->parent->leftChild = left_child;
-    else node->parent->rightChild = left_child;
-
-    left_child->rightChild = node;
-    node->parent = left_child;
+   // new parent will be node's left child
+    Node *nParent = node->leftChild;
+ 
+    // update root if current node is root
+    if (node == _root)
+      _root = nParent;
+ 
+    ShiftDown(node, nParent);
+ 
+    // connect x with new parent's right element
+    node->leftChild = nParent->rightChild;
+    // connect new parent's right element with node
+    // if it is not null
+    if (nParent->rightChild != NULL)
+      nParent->rightChild->parent = node;
+ 
+    // connect new parent with x
+    nParent->rightChild = node;
 }
 
 // Preorder print helper
@@ -325,5 +426,9 @@ void RBTree::SetChildrenNumbers(Node* current)
 // Recursive select helper
 Node* RBTree::RecursiveSelect(Node* current, int position)
 {
+    if(current == NULL) return NULL;
 
+    if(current->numChildrenLeft > position) return RecursiveSelect(current->leftChild, position);
+    else if(current->numChildrenLeft < position) return RecursiveSelect(current->rightChild, position - current->numChildrenLeft - 1);
+    else return current;
 }

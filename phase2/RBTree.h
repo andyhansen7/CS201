@@ -87,10 +87,14 @@ class RBTree
         Node* RecursiveSearch(Node* node, int key);
 
         // Recursive insert helper
-        void RecursiveInsert(Node* root, Node* newnode);
+        Node* RecursiveInsert(Node* root, Node* newnode);
 
         // Helper function to fix violations caused by insertion
         void RecolorTree(Node* newnode);
+        Node* GetUncle(Node* node);
+        void SwitchColors(Node* a, Node* b);
+        void ShiftDown(Node* node, Node* parent);
+        bool IsLeftChild(Node* node);
 
         // Rotation helpers 
         void LeftRotation(Node* node);
