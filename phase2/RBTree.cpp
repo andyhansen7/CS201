@@ -68,7 +68,19 @@ void RBTree::insert(int key, int value)
 // Removes node with key and returns 1. If key is not found, returns 0
 int RBTree::remove(int key)
 {
-    return 0; // TODO
+    // Empty tree
+    if(_root == NULL) return 0;
+ 
+    Node* search = RecursiveSearch(_root, key);
+
+    if(search == NULL) {
+        std::cout << "[ERROR] Node with key could not be found and removed" << std::endl;
+        return 0;
+    }
+    else {
+        Delete(search);
+        return 1;
+    }
 }
 
 // Returns the rank of key in tree, or 0 if key is not found. 
@@ -105,7 +117,7 @@ int* RBTree::successor(int key)
 {
     Node* search = RecursiveSearch(_root, key);
 
-    if(search == NULL) return new int();
+    if(search == NULL) return NULL;
 
     else {
         Node* sucessor = SuccessorNode(search);
@@ -118,7 +130,7 @@ int* RBTree::predecessor(int key)
 {
     Node* search = RecursiveSearch(_root, key);
 
-    if(search == NULL) return new int();
+    if(search == NULL) return NULL;
 
     else {
         Node* sucessor = PredecessorNode(search);
