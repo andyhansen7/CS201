@@ -1,13 +1,15 @@
 #include "RBTree.h"
 
 // Default constructor
-RBTree::RBTree()
+template<typename K, typename V>
+RBTree<K, V>::RBTree()
 {
     //std::cout << "New tree created using default constructor." << std::endl;
 }
 
 // Constructor using arrays
-RBTree::RBTree(int keys[], int values[], int s)
+template<typename K, typename V>
+RBTree<K, V>::RBTree(K keys[], V values[], int s)
 {
     //std::cout << "New tree created using array parameters." << std::endl;
 
@@ -21,25 +23,28 @@ RBTree::RBTree(int keys[], int values[], int s)
 }
 
 // Destructor
-RBTree::~RBTree()
+template<typename K, typename V>
+RBTree<K, V>::~RBTree()
 {
     //std::cout << "Destructor for tree called." << std::endl;
 }
 
 // Traditional search method. Returns pointer to value stored at key
-int* RBTree::search(int key)
+template<typename K, typename V>
+V* RBTree<K, V>::search(K key)
 {
-    Node* res = RecursiveSearch(_root, key);
+    Node<K, V>* res = RecursiveSearch(_root, key);
 
     if(res != NULL) return &(res->value);
     else return NULL;
 }
 
 // Inserts node with key and value into tree
-void RBTree::insert(int key, int value)
+template<typename K, typename V>
+void RBTree<K, V>::insert(K key, V value)
 {
     // Create new node
-    Node* newnode = new Node();
+    Node<K, V>* newnode = new Node<K, V>();
     newnode->key = key;
     newnode->value = value;
 
@@ -50,7 +55,7 @@ void RBTree::insert(int key, int value)
     }
 
     else {
-        Node* check = RecursiveSearch(_root, key);
+        Node<K, V>* check = RecursiveSearch(_root, key);
         if(check != NULL) {
             std::cout << "[ERROR] Insert called on new node with key already in tree" << std::endl;
             return;
@@ -66,12 +71,13 @@ void RBTree::insert(int key, int value)
 }
 
 // Removes node with key and returns 1. If key is not found, returns 0
-int RBTree::remove(int key)
+template<typename K, typename V>
+int RBTree<K, V>::remove(K key)
 {
     // Empty tree
     if(_root == NULL) return 0;
  
-    Node* search = RecursiveSearch(_root, key);
+    Node<K, V>* search = RecursiveSearch(_root, key);
 
     if(search == NULL) {
         std::cout << "[ERROR] Node with key could not be found and removed" << std::endl;
@@ -85,19 +91,21 @@ int RBTree::remove(int key)
 }
 
 // Returns the rank of key in tree, or 0 if key is not found. 
-int RBTree::rank(int key)
+template<typename K, typename V>
+int RBTree<K, V>::rank(K key)
 {
     // Recursively set ranks of all nodes in tree
     SetRanks(_root, 0);
 
-    Node* node = RecursiveSearch(_root, key);
+    Node<K, V>* node = RecursiveSearch(_root, key);
 
     if(node != NULL) return node->rank;
     else return 0;
 }
 
 // Returns the key of node at position in tree, with 1 being the root
-int RBTree::select(int position)
+template<typename K, typename V>
+int RBTree<K, V>::select(int position)
 {
     if(position < 1 || position > _size) {
         std::cout << "[ERROR] Call to select() with position out of bounds." << std::endl;
@@ -106,7 +114,7 @@ int RBTree::select(int position)
     else {
         SetChildrenNumbers(_root);
 
-        Node* node = RecursiveSelect(_root, position);
+        Node<K, V>* node = RecursiveSelect(_root, position);
 
         if(node != NULL) return node->key;
         else return 0;
@@ -114,66 +122,74 @@ int RBTree::select(int position)
 }
 
 // Returns pointer to the key following key in the tree, or NULL if none exists
-int* RBTree::successor(int key)
+template<typename K, typename V>
+K* RBTree<K, V>::successor(K key)
 {
-    Node* search = RecursiveSearch(_root, key);
+    Node<K, V>* search = RecursiveSearch(_root, key);
 
     if(search == NULL) return NULL;
 
     else {
-        Node* sucessor = SuccessorNode(search);
+        Node<K, V>* sucessor = SuccessorNode(search);
         return &(sucessor->key);
     }
 }
 
 // Returns pointer to the key before key in the tree, or NULL if none exists
-int* RBTree::predecessor(int key)
+template<typename K, typename V>
+K* RBTree<K, V>::predecessor(K key)
 {
-    Node* search = RecursiveSearch(_root, key);
+    Node<K, V>* search = RecursiveSearch(_root, key);
 
     if(search == NULL) return NULL;
 
     else {
-        Node* sucessor = PredecessorNode(search);
+        Node<K, V>* sucessor = PredecessorNode(search);
         return &(sucessor->key);
     }
 }
 
 // Returns size of tree
-int RBTree::size()
+template<typename K, typename V>
+int RBTree<K, V>::size()
 {
     return _size;
 }
 
 // Prints keys in preorder transversal
-void RBTree::preorder()
+template<typename K, typename V>
+void RBTree<K, V>::preorder()
 {
     if(_root == NULL) return;
     PreorderRecursive(_root);
 }
 
 // Prints keys in inorder transversal
-void RBTree::inorder()
+template<typename K, typename V>
+void RBTree<K, V>::inorder()
 {
     if(_root == NULL) return;
     InorderRecursive(_root);
 }
 
 // Prints keys in postorder transversal
-void RBTree::postorder()
+template<typename K, typename V>
+void RBTree<K, V>::postorder()
 {
     if(_root == NULL) return;
     PostorderRecursive(_root);
 }
         
 // Prints the smallest k keys in the tree
-void RBTree::printk(int k)
+template<typename K, typename V>
+void RBTree<K, V>::printk(int k)
 {
     return; // TODO
 }
 
 // Recursive search helper
-Node* RBTree::RecursiveSearch(Node* node, int key)
+template<typename K, typename V>
+Node<K, V>* RBTree<K, V>::RecursiveSearch(Node<K, V>* node, int key)
 {
     if(node == NULL) return NULL;
     else if(node->key == key) return node;
@@ -184,7 +200,8 @@ Node* RBTree::RecursiveSearch(Node* node, int key)
 }
 
 // Recursive insert helper
-Node* RBTree::RecursiveInsert(Node* root, Node* newnode)
+template<typename K, typename V>
+Node<K, V>* RBTree<K, V>::RecursiveInsert(Node<K, V>* root, Node<K, V>* newnode)
 {
     // Insertion case
     if(root == NULL) return newnode;
@@ -208,7 +225,8 @@ Node* RBTree::RecursiveInsert(Node* root, Node* newnode)
 }
 
 // Helper function to fix violations caused by insertion
-void RBTree::RecolorTree(Node* newnode)
+template<typename K, typename V>
+void RBTree<K, V>::RecolorTree(Node<K, V>* newnode)
 {
     // Color root black and end
     if (newnode == _root) {
@@ -217,9 +235,9 @@ void RBTree::RecolorTree(Node* newnode)
     }
  
     // Create parent, grandparent and uncle nodes for newnode
-    Node* parent = newnode->parent;
-    Node* grandparent = parent->parent;
-    Node* uncle = GetUncle(newnode);
+    Node<K, V>* parent = newnode->parent;
+    Node<K, V>* grandparent = parent->parent;
+    Node<K, V>* uncle = GetUncle(newnode);
  
     // Black parent
     if(parent->color != NodeColor::BLACK) {
@@ -262,7 +280,8 @@ void RBTree::RecolorTree(Node* newnode)
 }
 
 // Helper function that returns uncle node
-Node* RBTree::GetUncle(Node* node)
+template<typename K, typename V>
+Node<K, V>* RBTree<K, V>::GetUncle(Node<K, V>* node)
 {
     if(node->parent == NULL || node->parent->parent == NULL) return NULL;
 
@@ -271,7 +290,8 @@ Node* RBTree::GetUncle(Node* node)
 }
 
 // Switches the colors of nodes a and b
-void RBTree::SwitchColors(Node* a, Node* b)
+template<typename K, typename V>
+void RBTree<K, V>::SwitchColors(Node<K, V>* a, Node<K, V>* b)
 {
     NodeColor temp = a->color;
     a->color = b->color;
@@ -279,7 +299,8 @@ void RBTree::SwitchColors(Node* a, Node* b)
 }
 
 // Shifts node down and inserts parent above it
-void RBTree::ShiftDown(Node* node, Node* node_parent)
+template<typename K, typename V>
+void RBTree<K, V>::ShiftDown(Node<K, V>* node, Node<K, V>* node_parent)
 {
     if (node->parent != NULL) {
         if (IsLeftChild(node)) node->parent->leftChild = node_parent;
@@ -291,16 +312,18 @@ void RBTree::ShiftDown(Node* node, Node* node_parent)
 }
 
 // Macro to determine if node is left child of parent
-bool RBTree::IsLeftChild(Node* node)
+template<typename K, typename V>
+bool RBTree<K, V>::IsLeftChild(Node<K, V>* node)
 {
     return (node == node->parent->leftChild);
 }
 
 // Rotation helpers
-void RBTree::LeftRotation(Node* node)
+template<typename K, typename V>
+void RBTree<K, V>::LeftRotation(Node<K, V>* node)
 {
     // New parent is right child of node
-    Node* node_parent = node->rightChild;
+    Node<K, V>* node_parent = node->rightChild;
  
     // If node is root, just update it
     if (node == _root) _root = node_parent;
@@ -315,10 +338,11 @@ void RBTree::LeftRotation(Node* node)
     node_parent->leftChild = node;
 }
 
-void RBTree::RightRotation(Node* node)
+template<typename K, typename V>
+void RBTree<K, V>::RightRotation(Node<K, V>* node)
 {
     // New parent is right child of node
-    Node* node_parent = node->leftChild;
+    Node<K, V>* node_parent = node->leftChild;
  
     // If node is root, just update it
     if (node == _root) _root = node_parent;
@@ -333,8 +357,9 @@ void RBTree::RightRotation(Node* node)
     node_parent->rightChild = node;
 }
 
+template<typename K, typename V>
 // Helper to get node that will replace node
-Node* RBTree::GetClosest(Node* node)
+Node<K, V>* RBTree<K, V>::GetClosest(Node<K, V>* node)
 {
     // If node has 2 children
     if(node->leftChild != NULL && node->rightChild != NULL) return SuccessorNode(node->rightChild);
@@ -350,12 +375,13 @@ Node* RBTree::GetClosest(Node* node)
 }
 
 // Successor and predecessor helpers returning reference to a node
-Node* RBTree::PredecessorNode(Node* node)
+template<typename K, typename V>
+Node<K, V>* RBTree<K, V>::PredecessorNode(Node<K, V>* node)
 {
     if(node->leftChild != NULL) return RightmostNode(node->leftChild);
 
-    Node* parent = node->parent;
-    Node* temp = node;
+    Node<K, V>* parent = node->parent;
+    Node<K, V>* temp = node;
 
     while(parent != NULL && temp == parent->leftChild) {
         temp = parent;
@@ -365,12 +391,13 @@ Node* RBTree::PredecessorNode(Node* node)
     return parent;
 }
 
-Node* RBTree::SuccessorNode(Node* node)
+template<typename K, typename V>
+Node<K, V>* RBTree<K, V>::SuccessorNode(Node<K, V>* node)
 {
     if(node->rightChild != NULL) return LeftmostNode(node->rightChild);
 
-    Node* parent = node->parent;
-    Node* temp = node;
+    Node<K, V>* parent = node->parent;
+    Node<K, V>* temp = node;
 
     while(parent != NULL && temp == parent->rightChild) {
         temp = parent;
@@ -380,18 +407,20 @@ Node* RBTree::SuccessorNode(Node* node)
     return parent;
 }
 
-Node* RBTree::LeftmostNode(Node* root)
+template<typename K, typename V>
+Node<K, V>* RBTree<K, V>::LeftmostNode(Node<K, V>* root)
 {
-    Node* temp = root;
+    Node<K, V>* temp = root;
  
     while(temp->leftChild != NULL) temp = temp->leftChild;
  
     return temp;
 }
 
-Node* RBTree::RightmostNode(Node* root)
+template<typename K, typename V>
+Node<K, V>* RBTree<K, V>::RightmostNode(Node<K, V>* root)
 {
-    Node* temp = root;
+    Node<K, V>* temp = root;
  
     while(temp->rightChild != NULL) temp = temp->rightChild;
  
@@ -399,10 +428,11 @@ Node* RBTree::RightmostNode(Node* root)
 }
 
 // Recursive delete method
-void RBTree::Delete(Node* node)
+template<typename K, typename V>
+void RBTree<K, V>::Delete(Node<K, V>* node)
 
 /*{
-    Node* replacement = GetClosest(node);
+    Node<K, V>* replacement = GetClosest(node);
     
     // No predecesor to node to be replaced
     if(replacement == NULL) {
@@ -469,11 +499,11 @@ void RBTree::Delete(Node* node)
     Delete(replacement);
 }*/
 {
-    Node *u = GetClosest(node);
+    Node<K, V>* u = GetClosest(node);
  
     // True when u and v are both black
     bool uvBlack = ((u == NULL || u->color == NodeColor::BLACK) && (node->color == NodeColor::BLACK));
-    Node *parent = node->parent;
+    Node<K, V>* parent = node->parent;
  
     if (u == NULL) {
       // u is NULL therefore v is leaf
@@ -545,13 +575,15 @@ void RBTree::Delete(Node* node)
   }
 
 // Double-black correction helper
-void RBTree::FixDoubleBlack(Node* node)
+template<typename K, typename V>
+void RBTree<K, V>::FixDoubleBlack(Node<K, V>* node)
 {
     if (node == _root)
       // Reached root
       return;
  
-    Node *sibling = GetSibling(node), *parent = node->parent;
+    Node<K, V>* sibling = GetSibling(node);
+    Node<K, V>* parent = node->parent;
     if (sibling == NULL) {
       // No sibiling, double black pushed up
       FixDoubleBlack(parent);
@@ -615,7 +647,7 @@ void RBTree::FixDoubleBlack(Node* node)
     if(node == _root) return;
 
     // Find sibling of node;
-    Node* sibling;
+    Node<K, V>* sibling;
     if(IsLeftChild(node)) sibling = node->parent->rightChild;
     else sibling = node->parent->leftChild;
 
@@ -664,7 +696,8 @@ void RBTree::FixDoubleBlack(Node* node)
 }*/
 
 // Helper to get sibling of a node
-Node* RBTree::GetSibling(Node* node)
+template<typename K, typename V>
+Node<K, V>* RBTree<K, V>::GetSibling(Node<K, V>* node)
 {
     if(node->parent == NULL) return NULL;
     else if(IsLeftChild(node)) return node->parent->rightChild;
@@ -672,7 +705,8 @@ Node* RBTree::GetSibling(Node* node)
 }
 
 // Preorder print helper
-void RBTree::PreorderRecursive(Node* node)
+template<typename K, typename V>
+void RBTree<K, V>::PreorderRecursive(Node<K, V>* node)
 {
     if(node == NULL) return;
 
@@ -682,7 +716,8 @@ void RBTree::PreorderRecursive(Node* node)
 }
 
 // Inorder print helper
-void RBTree::InorderRecursive(Node* node)
+template<typename K, typename V>
+void RBTree<K, V>::InorderRecursive(Node<K, V>* node)
 {
     if(node == NULL) return;
 
@@ -692,7 +727,8 @@ void RBTree::InorderRecursive(Node* node)
 }
 
 // Postorder print helper
-void RBTree::PostorderRecursive(Node* node)
+template<typename K, typename V>
+void RBTree<K, V>::PostorderRecursive(Node<K, V>* node)
 {
     if(node == NULL) return;
 
@@ -702,7 +738,8 @@ void RBTree::PostorderRecursive(Node* node)
 }
 
 // Recursive function to set ranks
-void RBTree::SetRanks(Node* current, int currentRank) 
+template<typename K, typename V>
+void RBTree<K, V>::SetRanks(Node<K, V>* current, int currentRank) 
 {
     current->rank = currentRank + 1;
 
@@ -711,7 +748,8 @@ void RBTree::SetRanks(Node* current, int currentRank)
 }
 
 // Recursive function to set number of children of node
-void RBTree::SetChildrenNumbers(Node* current)
+template<typename K, typename V>
+void RBTree<K, V>::SetChildrenNumbers(Node<K, V>* current)
 {
     // Reset values
     current->numChildrenLeft = 0;
@@ -726,7 +764,8 @@ void RBTree::SetChildrenNumbers(Node* current)
 }
 
 // Recursive select helper
-Node* RBTree::RecursiveSelect(Node* current, int position)
+template<typename K, typename V>
+Node<K, V>* RBTree<K, V>::RecursiveSelect(Node<K, V>* current, int position)
 {
     if(current == NULL) return NULL;
 

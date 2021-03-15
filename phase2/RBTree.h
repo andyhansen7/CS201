@@ -9,27 +9,23 @@ enum class NodeColor {
     BLACK
 };
 
+template<typename K, typename V>
 class Node {
     public:
-        int key = 0;
-        int value = 0;
+        K key = 0;
+        V value = 0;
 
         NodeColor color = NodeColor::RED;
         int rank = 0;
         int numChildrenLeft = 0;
         int numChildrenRight = 0;
 
-        Node* leftChild = NULL;
-        Node* rightChild = NULL;
-        Node* parent = NULL;
-
-        void FreeNode() 
-        {
-            if(leftChild != NULL) leftChild->FreeNode();
-            if(rightChild != NULL) rightChild->FreeNode();
-        }
+        Node<K, V>* leftChild = NULL;
+        Node<K, V>* rightChild = NULL;
+        Node<K, V>* parent = NULL;
 };
 
+template<typename K, typename V>
 class RBTree
 {
     public:
@@ -37,31 +33,31 @@ class RBTree
         RBTree();
 
         // Constructor using arrays
-        RBTree(int keys[], int values[], int s);
+        RBTree(K keys[], V values[], int s);
 
         // Destructor
         ~RBTree();
 
         // Traditional search method. Returns pointer to value stored at key
-        int* search(int key);
+        V* search(K key);
 
         // Inserts node with key and value into tree
-        void insert(int key, int value);
+        void insert(K key, V value);
 
         // Removes node with key and returns 1. If key is not found, returns 0
-        int remove(int key);
+        int remove(K key);
 
         // Returns the rank of key in tree, or 0 if key is not found. 
-        int rank(int key);
+        int rank(K key);
 
         // Returns the key of node at position in tree, with 1 being the root
         int select(int position);
 
         // Returns pointer to the key following key in the tree, or NULL if none exists
-        int* successor(int key);
+        K* successor(K key);
 
         // Returns pointer to the key before key in the tree, or NULL if none exists
-        int* predecessor(int key);
+        K* predecessor(K key);
 
         // Returns size of tree
         int size();
@@ -79,66 +75,66 @@ class RBTree
         void printk(int k);
     
     private:
-        Node* _root = NULL;
+        Node<K, V>* _root = NULL;
 
         int _size = 0;
 
         // Recursive search helper
-        Node* RecursiveSearch(Node* node, int key);
+        Node<K, V>* RecursiveSearch(Node<K, V>* node, int key);
 
         // Recursive insert helper
-        Node* RecursiveInsert(Node* root, Node* newnode);
+        Node<K, V>* RecursiveInsert(Node<K, V>* root, Node<K, V>* newnode);
 
         // Helper function to fix violations caused by insertion
-        void RecolorTree(Node* newnode);
+        void RecolorTree(Node<K, V>* newnode);
 
         // Helper function that returns uncle node
-        Node* GetUncle(Node* node);
+        Node<K, V>* GetUncle(Node<K, V>* node);
 
         // Switches the colors of nodes a and b
-        void SwitchColors(Node* a, Node* b);
+        void SwitchColors(Node<K, V>* a, Node<K, V>* b);
 
         // Shifts node down and inserts parent above it
-        void ShiftDown(Node* node, Node* parent);
+        void ShiftDown(Node<K, V>* node, Node<K, V>* parent);
 
         // Macro to determine if node is left child of parent
-        bool IsLeftChild(Node* node);
+        bool IsLeftChild(Node<K, V>* node);
 
         // Rotation helpers 
-        void LeftRotation(Node* node);
-        void RightRotation(Node* node);
+        void LeftRotation(Node<K, V>* node);
+        void RightRotation(Node<K, V>* node);
 
         // Helper to get node that will replace node
-        Node* GetClosest(Node* node);
+        Node<K, V>* GetClosest(Node<K, V>* node);
 
         // Successor and predecessor helpers returning reference to a node
-        Node* PredecessorNode(Node* node);
-        Node* SuccessorNode(Node* node);
-        Node* LeftmostNode(Node* root);
-        Node* RightmostNode(Node* root);
+        Node<K, V>* PredecessorNode(Node<K, V>* node);
+        Node<K, V>* SuccessorNode(Node<K, V>* node);
+        Node<K, V>* LeftmostNode(Node<K, V>* root);
+        Node<K, V>* RightmostNode(Node<K, V>* root);
 
         // Recursive delete method
-        void Delete(Node* node);
+        void Delete(Node<K, V>* node);
 
         // Double-black correction helper
-        void FixDoubleBlack(Node* node);
+        void FixDoubleBlack(Node<K, V>* node);
 
         // Helper to get sibling of a node
-        Node* GetSibling(Node* node);
+        Node<K, V>* GetSibling(Node<K, V>* node);
         
         // Print helpers
-        void PreorderRecursive(Node* node);
-        void InorderRecursive(Node* node);
-        void PostorderRecursive(Node* node);
+        void PreorderRecursive(Node<K, V>* node);
+        void InorderRecursive(Node<K, V>* node);
+        void PostorderRecursive(Node<K, V>* node);
 
         // Recursive function to set ranks
-        void SetRanks(Node* current, int currentRank);
+        void SetRanks(Node<K, V>* current, int currentRank);
 
         // Recursive function to set number of children of node
-        void SetChildrenNumbers(Node* current);
+        void SetChildrenNumbers(Node<K, V>* current);
 
         // Recursive select helper
-        Node* RecursiveSelect(Node* current, int position);
+        Node<K, V>* RecursiveSelect(Node<K, V>* current, int position);
 };  
 
 #endif //_RBTree_H_

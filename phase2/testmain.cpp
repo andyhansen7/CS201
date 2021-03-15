@@ -5,7 +5,7 @@ using namespace std;
 
 int main() 
 {
-    RBTree t;
+    RBTree<int, int> t;
 
     for(int i = 0; i < 10; i++) {
         t.insert(i, i);
