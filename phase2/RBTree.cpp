@@ -79,6 +79,7 @@ int RBTree::remove(int key)
     }
     else {
         Delete(search);
+        _size--;
         return 1;
     }
 }
@@ -395,6 +396,279 @@ Node* RBTree::RightmostNode(Node* root)
     while(temp->rightChild != NULL) temp = temp->rightChild;
  
     return temp;
+}
+
+// Recursive delete method
+void RBTree::Delete(Node* node)
+
+/*{
+    Node* replacement = GetClosest(node);
+    
+    // No predecesor to node to be replaced
+    if(replacement == NULL) {
+        // Simply remove root if node is root
+        if(node == _root) _root = NULL;
+
+        else {
+            // Check for double-black case and fix
+            if((replacement->color == NodeColor::BLACK) && (node == NULL || node->color == NodeColor::BLACK)) FixDoubleBlack(node); // TODO
+
+            // Recolor sibling if one exists
+            else {
+                if((IsLeftChild(node) && node->parent->rightChild != NULL)) node->parent->rightChild->color = NodeColor::RED;
+                else if((!IsLeftChild(node) && node->parent->leftChild != NULL)) node->parent->leftChild->color = NodeColor::RED;
+            }   
+
+            // Perform deletion
+            if(IsLeftChild(node)) node->parent->leftChild = NULL;
+            else node->parent->rightChild = NULL;
+        }
+        
+        delete node;
+        return;
+    }
+    
+    // Node has less than 2 children
+    if(node->leftChild == NULL || node->rightChild == NULL) {
+        // Node is root - swap values and delete child
+        if(node == _root) {
+            node->key = replacement->key;
+            node->value = replacement->value;
+            node->leftChild = NULL;
+            node->rightChild = NULL;
+
+            delete replacement;
+        }
+        // Switch node and replacement
+        else {
+            if(IsLeftChild(node)) node->parent->leftChild = replacement;
+            else node->parent->rightChild = replacement;
+
+            replacement->parent = node->parent;
+
+            delete node;
+
+            // Check for double black case and fix
+            if((replacement->color == NodeColor::BLACK) && (node == NULL || node->color == NodeColor::BLACK)) FixDoubleBlack(replacement);
+            else replacement->color = NodeColor::BLACK;
+        }
+
+        return;
+    }
+
+    // Node has 2 children, recursive case
+    int tempkey = node->key;
+    int tempval = node->value;
+
+    node->key = replacement->key;
+    node->value = replacement->value;
+
+    replacement->key = tempkey;
+    replacement->value = tempval;
+
+    Delete(replacement);
+}*/
+{
+    Node *u = GetClosest(node);
+ 
+    // True when u and v are both black
+    bool uvBlack = ((u == NULL || u->color == NodeColor::BLACK) && (node->color == NodeColor::BLACK));
+    Node *parent = node->parent;
+ 
+    if (u == NULL) {
+      // u is NULL therefore v is leaf
+      if (node == _root) {
+        // v is root, making root null
+        _root = NULL;
+      } else {
+        if (uvBlack) {
+          // u and v both black
+          // v is leaf, fix double black at v
+          FixDoubleBlack(node);
+        } else {
+          // u or v is red
+          if (GetSibling(node) != NULL)
+            // sibling is not null, make it red"
+            GetSibling(node)->color = NodeColor::RED;
+        }
+ 
+        // delete v from the tree
+        if (IsLeftChild(node)) {
+          parent->leftChild = NULL;
+        } else {
+          parent->rightChild = NULL;
+        }
+      }
+      delete node;
+      return;
+    }
+ 
+    if (node->leftChild == NULL || node->rightChild == NULL) {
+      // v has 1 child
+      if (node == _root) {
+        // v is root, assign the value of u to v, and delete u
+        node->key = u->key;
+        node->value = u->value;
+        node->leftChild = node->rightChild = NULL;
+        delete u;
+      } else {
+        // Detach v from tree and move u up
+        if (IsLeftChild(node)) {
+          parent->leftChild = u;
+        } else {
+          parent->rightChild = u;
+        }
+        delete node;
+        u->parent = parent;
+        if (uvBlack) {
+          // u and v both black, fix double black at u
+          FixDoubleBlack(u);
+        } else {
+          // u or v red, color u black
+          u->color = NodeColor::BLACK;
+        }
+      }
+      return;
+    }
+ 
+    // v has 2 children, swap values with successor and recurse
+    int tempkey = node->key;
+    int tempval = node->value;
+
+    node->key = u->key;
+    node->value = u->value;
+
+    u->key = tempkey;
+    u->value = tempval;
+
+    Delete(u);
+  }
+
+// Double-black correction helper
+void RBTree::FixDoubleBlack(Node* node)
+{
+    if (node == _root)
+      // Reached root
+      return;
+ 
+    Node *sibling = GetSibling(node), *parent = node->parent;
+    if (sibling == NULL) {
+      // No sibiling, double black pushed up
+      FixDoubleBlack(parent);
+    } 
+    else {
+      if (sibling->color == NodeColor::RED) {
+        // Sibling red
+        parent->color = NodeColor::RED;
+        sibling->color = NodeColor::BLACK;
+        if (IsLeftChild(sibling)) {
+          // left case
+          RightRotation(parent);
+        } else {
+          // right case
+          LeftRotation(parent);
+        }
+        FixDoubleBlack(node);
+      } else {
+        // Sibling black
+        if ( (sibling->leftChild != NULL && sibling->leftChild->color == NodeColor::RED) && (sibling->rightChild != NULL && sibling->rightChild->color == NodeColor::RED) ) {
+          // at least 1 red children
+          if (sibling->leftChild != NULL && sibling->leftChild->color == NodeColor::RED) {
+            if (IsLeftChild(sibling)) {
+              // left left
+              sibling->leftChild->color = sibling->color;
+              sibling->color = parent->color;
+              RightRotation(parent);
+            } else {
+              // right left
+              sibling->leftChild->color = parent->color;
+              RightRotation(sibling);
+              LeftRotation(parent);
+            }
+          } else {
+            if (IsLeftChild(sibling)) {
+              // left right
+              sibling->rightChild->color = parent->color;
+              LeftRotation(sibling);
+              RightRotation(parent);
+            } else {
+              // right right
+              sibling->rightChild->color = sibling->color;
+              sibling->color = parent->color;
+              LeftRotation(parent);
+            }
+          }
+          parent->color = NodeColor::BLACK;
+        } else {
+          // 2 black children
+          sibling->color = NodeColor::RED;
+          if (parent->color == NodeColor::BLACK)
+            FixDoubleBlack(parent);
+          else
+            parent->color = NodeColor::BLACK;
+        }
+      }
+    }
+  }
+/*{
+    // Exit case
+    if(node == _root) return;
+
+    // Find sibling of node;
+    Node* sibling;
+    if(IsLeftChild(node)) sibling = node->parent->rightChild;
+    else sibling = node->parent->leftChild;
+
+    // No sibling, recurse on parent
+    if(sibling == NULL) FixDoubleBlack(node->parent);
+
+    else {
+        // Sibling left child is red
+        if((sibling->leftChild != NULL && sibling->leftChild->color == NodeColor::RED)) {
+            if(IsLeftChild(sibling)) {
+                sibling->leftChild->color = sibling->color;
+                sibling->color = node->parent->color;
+
+                RightRotation(node->parent);
+            }
+            else {
+                sibling->leftChild->color = node->parent->color;
+
+                RightRotation(sibling);
+                LeftRotation(node->parent);
+            }
+        }
+        // Sibling right child is red
+        else if((sibling->rightChild != NULL && sibling->rightChild->color == NodeColor::RED)) {
+            if(IsLeftChild(sibling)) {
+                sibling->rightChild->color = node->parent->color;
+
+                LeftRotation(sibling);
+                RightRotation(node->parent);
+            }
+            else {
+                sibling->rightChild->color = sibling->color;
+                sibling->color = node->parent->color;
+
+                LeftRotation(node->parent);
+            }
+        }
+        // Sibling has 2 black children
+        else {
+            sibling->color = NodeColor::RED;
+
+            if(node->parent->color == NodeColor::BLACK) FixDoubleBlack(node->parent);
+            else node->parent->color = NodeColor::BLACK;
+        }
+    }
+}*/
+
+// Helper to get sibling of a node
+Node* RBTree::GetSibling(Node* node)
+{
+    if(node->parent == NULL) return NULL;
+    else if(IsLeftChild(node)) return node->parent->rightChild;
+    else return node->parent->leftChild;
 }
 
 // Preorder print helper

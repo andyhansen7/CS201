@@ -278,7 +278,8 @@ class RBTree {
     if (sibling == NULL) {
       // No sibiling, double black pushed up
       fixDoubleBlack(parent);
-    } else {
+    } 
+    else {
       if (sibling->color == RED) {
         // Sibling red
         parent->color = RED;

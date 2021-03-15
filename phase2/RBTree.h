@@ -116,6 +116,15 @@ class RBTree
         Node* SuccessorNode(Node* node);
         Node* LeftmostNode(Node* root);
         Node* RightmostNode(Node* root);
+
+        // Recursive delete method
+        void Delete(Node* node);
+
+        // Double-black correction helper
+        void FixDoubleBlack(Node* node);
+
+        // Helper to get sibling of a node
+        Node* GetSibling(Node* node);
         
         // Print helpers
         void PreorderRecursive(Node* node);
