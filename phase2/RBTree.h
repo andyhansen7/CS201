@@ -12,8 +12,8 @@ enum class NodeColor {
 template<typename K, typename V>
 class Node {
     public:
-        K key = 0;
-        V value = 0;
+        K key;
+        V value;
 
         NodeColor color = NodeColor::RED;
         int rank = 0;
@@ -51,7 +51,7 @@ class RBTree
         int rank(K key);
 
         // Returns the key of node at position in tree, with 1 being the root
-        int select(int position);
+        K select(int position);
 
         // Returns pointer to the key following key in the tree, or NULL if none exists
         K* successor(K key);
@@ -80,7 +80,7 @@ class RBTree
         int _size = 0;
 
         // Recursive search helper
-        Node<K, V>* RecursiveSearch(Node<K, V>* node, int key);
+        Node<K, V>* RecursiveSearch(Node<K, V>* node, K key);
 
         // Recursive insert helper
         Node<K, V>* RecursiveInsert(Node<K, V>* root, Node<K, V>* newnode);
@@ -135,6 +135,13 @@ class RBTree
 
         // Recursive select helper
         Node<K, V>* RecursiveSelect(Node<K, V>* current, int position);
+
+        // Node size helper
+        int GetNodeSize(Node<K, V>* node);
+
+        // Rank helper
+        int RankOf(Node<K, V>* node);
+        int RecursiveRank(Node<K, V>* current, K key);
 };  
 
 #endif //_RBTree_H_

@@ -57,7 +57,7 @@ void RBTree<K, V>::insert(K key, V value)
     else {
         Node<K, V>* check = RecursiveSearch(_root, key);
         if(check != NULL) {
-            std::cout << "[ERROR] Insert called on new node with key already in tree" << std::endl;
+            //std::cout << "[ERROR] Insert called on new node with key already in tree" << std::endl;
             return;
         }
 
@@ -80,7 +80,7 @@ int RBTree<K, V>::remove(K key)
     Node<K, V>* search = RecursiveSearch(_root, key);
 
     if(search == NULL) {
-        std::cout << "[ERROR] Node with key could not be found and removed" << std::endl;
+        //std::cout << "[ERROR] Node with key could not be found and removed" << std::endl;
         return 0;
     }
     else {
@@ -93,26 +93,28 @@ int RBTree<K, V>::remove(K key)
 // Returns the rank of key in tree, or 0 if key is not found. 
 template<typename K, typename V>
 int RBTree<K, V>::rank(K key)
-{
+{   /*
     // Recursively set ranks of all nodes in tree
     SetRanks(_root, 0);
 
     Node<K, V>* node = RecursiveSearch(_root, key);
 
-    if(node != NULL) return node->rank;
+    if(node != NULL) return RankOf(node);
     else return 0;
+    */
+    return 1 + RecursiveRank(_root, key);
 }
 
 // Returns the key of node at position in tree, with 1 being the root
 template<typename K, typename V>
-int RBTree<K, V>::select(int position)
+K RBTree<K, V>::select(int position)
 {
     if(position < 1 || position > _size) {
-        std::cout << "[ERROR] Call to select() with position out of bounds." << std::endl;
+        //std::cout << "[ERROR] Call to select() with position out of bounds." << std::endl;
         return 0;
     }
     else {
-        SetChildrenNumbers(_root);
+        //SetChildrenNumbers(_root);
 
         Node<K, V>* node = RecursiveSelect(_root, position);
 
@@ -162,6 +164,7 @@ void RBTree<K, V>::preorder()
 {
     if(_root == NULL) return;
     PreorderRecursive(_root);
+    std::cout << std::endl;
 }
 
 // Prints keys in inorder transversal
@@ -170,6 +173,7 @@ void RBTree<K, V>::inorder()
 {
     if(_root == NULL) return;
     InorderRecursive(_root);
+    std::cout << std::endl;
 }
 
 // Prints keys in postorder transversal
@@ -178,18 +182,23 @@ void RBTree<K, V>::postorder()
 {
     if(_root == NULL) return;
     PostorderRecursive(_root);
+    std::cout << std::endl;
 }
         
 // Prints the smallest k keys in the tree
 template<typename K, typename V>
 void RBTree<K, V>::printk(int k)
 {
-    return; // TODO
+    for(int i = 1; i <= k; i++)
+    {
+        std::cout << select(i) << " ";
+    }
+    std::cout << std::endl;
 }
 
 // Recursive search helper
 template<typename K, typename V>
-Node<K, V>* RBTree<K, V>::RecursiveSearch(Node<K, V>* node, int key)
+Node<K, V>* RBTree<K, V>::RecursiveSearch(Node<K, V>* node, K key)
 {
     if(node == NULL) return NULL;
     else if(node->key == key) return node;
@@ -218,7 +227,7 @@ Node<K, V>* RBTree<K, V>::RecursiveInsert(Node<K, V>* root, Node<K, V>* newnode)
     } 
     // Something is fucked
     else {
-        std::cout << "[ERROR] Insert called on new node with key already in tree" << std::endl;
+        //std::cout << "[ERROR] Insert called on new node with key already in tree" << std::endl;
     } 
 
     return root;
@@ -315,6 +324,7 @@ void RBTree<K, V>::ShiftDown(Node<K, V>* node, Node<K, V>* node_parent)
 template<typename K, typename V>
 bool RBTree<K, V>::IsLeftChild(Node<K, V>* node)
 {
+    if(node->parent == NULL) return false;
     return (node == node->parent->leftChild);
 }
 
@@ -562,8 +572,8 @@ void RBTree<K, V>::Delete(Node<K, V>* node)
     }
  
     // v has 2 children, swap values with successor and recurse
-    int tempkey = node->key;
-    int tempval = node->value;
+    K tempkey = node->key;
+    V tempval = node->value;
 
     node->key = u->key;
     node->value = u->value;
@@ -769,7 +779,52 @@ Node<K, V>* RBTree<K, V>::RecursiveSelect(Node<K, V>* current, int position)
 {
     if(current == NULL) return NULL;
 
-    if(current->numChildrenLeft > position) return RecursiveSelect(current->leftChild, position);
-    else if(current->numChildrenLeft < position) return RecursiveSelect(current->rightChild, position - current->numChildrenLeft - 1);
+    int numlower = GetNodeSize(current->leftChild) + 1;
+
+    if(numlower > position) return RecursiveSelect(current->leftChild, position);
+    else if(numlower < position) return RecursiveSelect(current->rightChild, position - numlower);
     else return current;
+
+    /*int numlower = GetNodeSize(current->leftChild) + 1;
+
+    if(position == numlower) return current;
+    else if(position < numlower) return RecursiveSelect(current->leftChild, position);
+    else return RecursiveSelect(current->rightChild, position - numlower);*/
+}
+
+// Node size helper
+template<typename K, typename V>
+int RBTree<K, V>::GetNodeSize(Node<K, V>* node)
+{
+    if(node == NULL) return 0;
+
+    return 1 + GetNodeSize(node->leftChild) + GetNodeSize(node->rightChild);
+}
+
+// Rank helper
+template<typename K, typename V>
+int RBTree<K, V>::RankOf(Node<K, V>* node)
+{
+    /*int r = GetNodeSize(node->leftChild) + 1;
+
+    Node<K, V>* current = node;
+
+    while(current != _root) {
+        if(!IsLeftChild(current)) r += (GetNodeSize(current->parent->leftChild) + 1);
+
+        current = current->parent;
+    }
+
+    return r;*/
+    return 0;
+}
+
+template<typename K, typename V>
+int RBTree<K, V>::RecursiveRank(Node<K, V>* current, K key)
+{
+    if(current == NULL) return 0;
+
+    if(current->key > key) return RecursiveRank(current->leftChild, key);
+    else if (current->key < key) return 1 + GetNodeSize(current->leftChild) + RecursiveRank(current->rightChild, key); 
+    else return GetNodeSize(current->leftChild); 
 }
