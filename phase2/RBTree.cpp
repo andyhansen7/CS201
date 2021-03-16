@@ -470,7 +470,7 @@ void RBTree<K, V>::Delete(Node<K, V>* node)
             node->value = replacementnode->value;
             node->leftChild = node->rightChild = NULL;
 
-            delete u;
+            delete replacementnode;
         } 
         // Detach node from tree
         else {
@@ -499,7 +499,7 @@ void RBTree<K, V>::Delete(Node<K, V>* node)
     replacementnode->key = tempkey;
     replacementnode->value = tempval;
 
-    Delete(u);
+    Delete(replacementnode);
 }
 
 // Double-black correction helper
