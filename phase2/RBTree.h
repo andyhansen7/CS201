@@ -1,3 +1,11 @@
+/* ==========================
+ * Red - Black Tree 
+ * CS201-001 Spring 2021
+ * Developed by Andrew Hansen
+ * arhansen@crimson.ua.edu
+ * ===========================
+ */
+
 #ifndef _RBTree_H_
 #define _RBTree_H_
 
@@ -34,6 +42,12 @@ class RBTree
 
         // Constructor using arrays
         RBTree(K keys[], V values[], int s);
+
+        // Traditional copy constructor
+        RBTree& operator=(RBTree& tree);
+
+        // Traditional copy assignment operator
+        RBTree(RBTree& tree);
 
         // Destructor
         ~RBTree();

@@ -1,3 +1,11 @@
+/* ==========================
+ * Red - Black Tree 
+ * CS201-001 Spring 2021
+ * Developed by Andrew Hansen
+ * arhansen@crimson.ua.edu
+ * ===========================
+ */
+
 #include "RBTree.h"
 
 // Default constructor
@@ -20,6 +28,32 @@ RBTree<K, V>::RBTree(K keys[], V values[], int s)
     }
 
     ///std::cout << "Tree creation complete." << std::endl;
+}
+
+// Traditional copy constructor
+template<typename K, typename V>
+RBTree<K, V>& RBTree<K, V>::operator=(RBTree<K, V>& tree)
+{
+    for(int i = 0; i < tree.size(); i++) {
+        K key = tree.select(i + 1);
+        V val = tree.search(key);
+
+        insert(key, val);
+    }
+
+    return *this;
+}
+
+// Traditional copy assignment operator
+template<typename K, typename V>
+RBTree<K, V>::RBTree(RBTree<K, V>& tree)
+{
+    for(int i = 0; i < tree.size(); i++) {
+        K key = tree.select(i + 1);
+        V val = tree.search(key);
+
+        insert(key, val);
+    }
 }
 
 // Destructor
@@ -481,7 +515,7 @@ void RBTree<K, V>::Delete(Node<K, V>* node)
             delete node;
 
             // Check and fix double-black
-            if(doubleblack) FixDoubleBlack(u);
+            if(doubleblack) FixDoubleBlack(replacementnode);
             // Recolor replacement node
             else replacementnode->color = NodeColor::BLACK;
         }
