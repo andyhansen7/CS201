@@ -36,7 +36,7 @@ RBTree<K, V>& RBTree<K, V>::operator=(RBTree<K, V>& tree)
 {
     for(int i = 0; i < tree.size(); i++) {
         K key = tree.select(i + 1);
-        V val = tree.search(key);
+        V val = *(tree.search(key));
 
         insert(key, val);
     }
@@ -50,7 +50,7 @@ RBTree<K, V>::RBTree(RBTree<K, V>& tree)
 {
     for(int i = 0; i < tree.size(); i++) {
         K key = tree.select(i + 1);
-        V val = tree.search(key);
+        V val = *(tree.search(key));
 
         insert(key, val);
     }

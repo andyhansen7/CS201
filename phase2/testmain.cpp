@@ -18,17 +18,25 @@ int main()
 
     //for(int i = 1; i <  11; i++) cout << t.select(i) << endl;
 
-    cout << endl << endl;
+    /*cout << endl << endl;
 
     for(int i = 0; i < 10; i++ ) {
         t.remove(i);
         t.inorder();
         cout << endl << endl;
-    }
+    }*/
 
     /*for(int i = 0; i < 10; i++) {
         std::cout << *(t.search(i)) << endl;
     }*/
+
+    cout << endl << endl;
+
+    RBTree<int, int> a(t);
+    t.inorder();
+
+    RBTree<int, int> b = t;
+    b.inorder();
 
     return 0;
 }
