@@ -93,15 +93,7 @@ int RBTree<K, V>::remove(K key)
 // Returns the rank of key in tree, or 0 if key is not found. 
 template<typename K, typename V>
 int RBTree<K, V>::rank(K key)
-{   /*
-    // Recursively set ranks of all nodes in tree
-    SetRanks(_root, 0);
-
-    Node<K, V>* node = RecursiveSearch(_root, key);
-
-    if(node != NULL) return RankOf(node);
-    else return 0;
-    */
+{   
     return 1 + RecursiveRank(_root, key);
 }
 
@@ -372,16 +364,14 @@ template<typename K, typename V>
 Node<K, V>* RBTree<K, V>::GetClosest(Node<K, V>* node)
 {
     // If node has 2 children
-    if(node->leftChild != NULL && node->rightChild != NULL) return SuccessorNode(node->rightChild);
+    if(node->leftChild != NULL && node->rightChild != NULL) return LeftmostNode(node->rightChild);
  
     // If node is leaf node
     else if(node->leftChild == NULL && node->rightChild == NULL) return NULL;
  
     // Node has only one child
-    else {
-        if(node->leftChild != NULL) return node->leftChild;
-        else return node->rightChild;
-    }
+    if(node->leftChild != NULL) return node->leftChild;
+    else return node->rightChild;
 }
 
 // Successor and predecessor helpers returning reference to a node
@@ -440,270 +430,160 @@ Node<K, V>* RBTree<K, V>::RightmostNode(Node<K, V>* root)
 // Recursive delete method
 template<typename K, typename V>
 void RBTree<K, V>::Delete(Node<K, V>* node)
-
-/*{
-    Node<K, V>* replacement = GetClosest(node);
-    
-    // No predecesor to node to be replaced
-    if(replacement == NULL) {
-        // Simply remove root if node is root
-        if(node == _root) _root = NULL;
-
-        else {
-            // Check for double-black case and fix
-            if((replacement->color == NodeColor::BLACK) && (node == NULL || node->color == NodeColor::BLACK)) FixDoubleBlack(node); // TODO
-
-            // Recolor sibling if one exists
-            else {
-                if((IsLeftChild(node) && node->parent->rightChild != NULL)) node->parent->rightChild->color = NodeColor::RED;
-                else if((!IsLeftChild(node) && node->parent->leftChild != NULL)) node->parent->leftChild->color = NodeColor::RED;
-            }   
-
-            // Perform deletion
-            if(IsLeftChild(node)) node->parent->leftChild = NULL;
-            else node->parent->rightChild = NULL;
-        }
-        
-        delete node;
-        return;
-    }
-    
-    // Node has less than 2 children
-    if(node->leftChild == NULL || node->rightChild == NULL) {
-        // Node is root - swap values and delete child
-        if(node == _root) {
-            node->key = replacement->key;
-            node->value = replacement->value;
-            node->leftChild = NULL;
-            node->rightChild = NULL;
-
-            delete replacement;
-        }
-        // Switch node and replacement
-        else {
-            if(IsLeftChild(node)) node->parent->leftChild = replacement;
-            else node->parent->rightChild = replacement;
-
-            replacement->parent = node->parent;
-
-            delete node;
-
-            // Check for double black case and fix
-            if((replacement->color == NodeColor::BLACK) && (node == NULL || node->color == NodeColor::BLACK)) FixDoubleBlack(replacement);
-            else replacement->color = NodeColor::BLACK;
-        }
-
-        return;
-    }
-
-    // Node has 2 children, recursive case
-    int tempkey = node->key;
-    int tempval = node->value;
-
-    node->key = replacement->key;
-    node->value = replacement->value;
-
-    replacement->key = tempkey;
-    replacement->value = tempval;
-
-    Delete(replacement);
-}*/
 {
-    Node<K, V>* u = GetClosest(node);
- 
-    // True when u and v are both black
-    bool uvBlack = ((u == NULL || u->color == NodeColor::BLACK) && (node->color == NodeColor::BLACK));
+    Node<K, V>* replacementnode = GetClosest(node);
     Node<K, V>* parent = node->parent;
  
-    if (u == NULL) {
-      // u is NULL therefore v is leaf
-      if (node == _root) {
-        // v is root, making root null
-        _root = NULL;
-      } else {
-        if (uvBlack) {
-          // u and v both black
-          // v is leaf, fix double black at v
-          FixDoubleBlack(node);
-        } else {
-          // u or v is red
-          if (GetSibling(node) != NULL)
-            // sibling is not null, make it red"
-            GetSibling(node)->color = NodeColor::RED;
-        }
+    // Both node and its replacement are black
+    bool doubleblack = ((replacementnode == NULL || replacementnode->color == NodeColor::BLACK) && (node->color == NodeColor::BLACK));
  
-        // delete v from the tree
-        if (IsLeftChild(node)) {
-          parent->leftChild = NULL;
-        } else {
-          parent->rightChild = NULL;
-        }
+    // Node is a leaf node
+    if(replacementnode == NULL) {
+        // Reset root if it is being deleted
+        if (node == _root) _root = NULL;
+        
+        else {
+            // Fix double black case
+            if(doubleblack) FixDoubleBlack(node);
+
+            // One of them is red
+            else {
+                // Set sibling to red
+                if (GetSibling(node) != NULL) GetSibling(node)->color = NodeColor::RED;
+            }
+ 
+            // Delete node from tree
+            if(IsLeftChild(node)) parent->leftChild = NULL;
+            else parent->rightChild = NULL;
       }
+
       delete node;
       return;
     }
- 
-    if (node->leftChild == NULL || node->rightChild == NULL) {
-      // v has 1 child
-      if (node == _root) {
-        // v is root, assign the value of u to v, and delete u
-        node->key = u->key;
-        node->value = u->value;
-        node->leftChild = node->rightChild = NULL;
-        delete u;
-      } else {
-        // Detach v from tree and move u up
-        if (IsLeftChild(node)) {
-          parent->leftChild = u;
-        } else {
-          parent->rightChild = u;
+    
+    // Node has only one child
+    if(node->leftChild == NULL || node->rightChild == NULL) {
+
+        // Node is root, replace values
+        if (node == _root) {
+            node->key = replacementnode->key;
+            node->value = replacementnode->value;
+            node->leftChild = node->rightChild = NULL;
+
+            delete u;
+        } 
+        // Detach node from tree
+        else {
+            if (IsLeftChild(node)) parent->leftChild = replacementnode;
+            else parent->rightChild = replacementnode;
+            
+            replacementnode->parent = parent;
+            delete node;
+
+            // Check and fix double-black
+            if(doubleblack) FixDoubleBlack(u);
+            // Recolor replacement node
+            else replacementnode->color = NodeColor::BLACK;
         }
-        delete node;
-        u->parent = parent;
-        if (uvBlack) {
-          // u and v both black, fix double black at u
-          FixDoubleBlack(u);
-        } else {
-          // u or v red, color u black
-          u->color = NodeColor::BLACK;
-        }
-      }
-      return;
+      
+        return;
     }
  
-    // v has 2 children, swap values with successor and recurse
+    // Swap replacement and node values and recurse
     K tempkey = node->key;
     V tempval = node->value;
 
-    node->key = u->key;
-    node->value = u->value;
+    node->key = replacementnode->key;
+    node->value = replacementnode->value;
 
-    u->key = tempkey;
-    u->value = tempval;
+    replacementnode->key = tempkey;
+    replacementnode->value = tempval;
 
     Delete(u);
-  }
+}
 
 // Double-black correction helper
 template<typename K, typename V>
 void RBTree<K, V>::FixDoubleBlack(Node<K, V>* node)
 {
-    if (node == _root)
-      // Reached root
-      return;
+    // Exit if at root
+    if(node == _root) return;
  
     Node<K, V>* sibling = GetSibling(node);
-    Node<K, V>* parent = node->parent;
-    if (sibling == NULL) {
-      // No sibiling, double black pushed up
-      FixDoubleBlack(parent);
-    } 
-    else {
-      if (sibling->color == NodeColor::RED) {
-        // Sibling red
-        parent->color = NodeColor::RED;
-        sibling->color = NodeColor::BLACK;
-        if (IsLeftChild(sibling)) {
-          // left case
-          RightRotation(parent);
-        } else {
-          // right case
-          LeftRotation(parent);
-        }
-        FixDoubleBlack(node);
-      } else {
-        // Sibling black
-        if ( (sibling->leftChild != NULL && sibling->leftChild->color == NodeColor::RED) && (sibling->rightChild != NULL && sibling->rightChild->color == NodeColor::RED) ) {
-          // at least 1 red children
-          if (sibling->leftChild != NULL && sibling->leftChild->color == NodeColor::RED) {
-            if (IsLeftChild(sibling)) {
-              // left left
-              sibling->leftChild->color = sibling->color;
-              sibling->color = parent->color;
-              RightRotation(parent);
-            } else {
-              // right left
-              sibling->leftChild->color = parent->color;
-              RightRotation(sibling);
-              LeftRotation(parent);
-            }
-          } else {
-            if (IsLeftChild(sibling)) {
-              // left right
-              sibling->rightChild->color = parent->color;
-              LeftRotation(sibling);
-              RightRotation(parent);
-            } else {
-              // right right
-              sibling->rightChild->color = sibling->color;
-              sibling->color = parent->color;
-              LeftRotation(parent);
-            }
-          }
-          parent->color = NodeColor::BLACK;
-        } else {
-          // 2 black children
-          sibling->color = NodeColor::RED;
-          if (parent->color == NodeColor::BLACK)
-            FixDoubleBlack(parent);
-          else
-            parent->color = NodeColor::BLACK;
-        }
-      }
-    }
-  }
-/*{
-    // Exit case
-    if(node == _root) return;
+    //Node<K, V>* parent = node->parent;
 
-    // Find sibling of node;
-    Node<K, V>* sibling;
-    if(IsLeftChild(node)) sibling = node->parent->rightChild;
-    else sibling = node->parent->leftChild;
-
-    // No sibling, recurse on parent
+    // If no sibling, recurse on parent
     if(sibling == NULL) FixDoubleBlack(node->parent);
 
     else {
-        // Sibling left child is red
-        if((sibling->leftChild != NULL && sibling->leftChild->color == NodeColor::RED)) {
-            if(IsLeftChild(sibling)) {
-                sibling->leftChild->color = sibling->color;
-                sibling->color = node->parent->color;
+        // Red sibling
+        if(sibling->color == NodeColor::RED) {
+            node->parent->color = NodeColor::RED;
+            sibling->color = NodeColor::BLACK;
 
-                RightRotation(node->parent);
-            }
-            else {
-                sibling->leftChild->color = node->parent->color;
+            // Left case
+            if(IsLeftChild(sibling)) RightRotation(node->parent);
+            // Right case 
+            else LeftRotation(node->parent);
 
-                RightRotation(sibling);
-                LeftRotation(node->parent);
-            }
+            // Recurse 
+            FixDoubleBlack(node);
         }
-        // Sibling right child is red
-        else if((sibling->rightChild != NULL && sibling->rightChild->color == NodeColor::RED)) {
-            if(IsLeftChild(sibling)) {
-                sibling->rightChild->color = node->parent->color;
 
-                LeftRotation(sibling);
-                RightRotation(node->parent);
-            }
-            else {
-                sibling->rightChild->color = sibling->color;
-                sibling->color = node->parent->color;
-
-                LeftRotation(node->parent);
-            }
-        }
-        // Sibling has 2 black children
+        // Black sibling 
         else {
-            sibling->color = NodeColor::RED;
+            if( (sibling->leftChild != NULL && sibling->leftChild->color == NodeColor::RED) || (sibling->rightChild != NULL && sibling->rightChild->color == NodeColor::RED) ) {
 
-            if(node->parent->color == NodeColor::BLACK) FixDoubleBlack(node->parent);
-            else node->parent->color = NodeColor::BLACK;
+                // Red left child
+                if(sibling->leftChild != NULL && sibling->leftChild->color == NodeColor::RED) {
+
+                    // Node is right child
+                    if(IsLeftChild(sibling)) {
+                        sibling->leftChild->color = sibling->color;
+                        sibling->color = node->parent->color;
+
+                        RightRotation(node->parent);
+                    } 
+                    
+                    // Node is left child
+                    else {
+                        sibling->leftChild->color = node->parent->color;
+
+                        RightRotation(sibling);
+                        LeftRotation(node->parent);
+                    }
+                }
+                else {
+
+                    // Node is right child
+                    if(IsLeftChild(sibling)) {
+                        sibling->rightChild->color = node->parent->color;
+
+                        LeftRotation(sibling);
+                        RightRotation(node->parent);
+                    }
+                    else {
+                        sibling->rightChild->color = sibling->color;
+                        sibling->color = node->parent->color;
+
+                        LeftRotation(node->parent);
+                    }
+                }
+
+                node->parent->color = NodeColor::BLACK;
+            }
+
+            // Both children black
+            else {
+                sibling->color = NodeColor::RED;
+
+                // Check and fix double black case
+                if(node->parent->color == NodeColor::BLACK) FixDoubleBlack(node->parent);
+                else node->parent->color = NodeColor::BLACK;
+            }
         }
     }
-}*/
+}
 
 // Helper to get sibling of a node
 template<typename K, typename V>
@@ -784,12 +664,6 @@ Node<K, V>* RBTree<K, V>::RecursiveSelect(Node<K, V>* current, int position)
     if(numlower > position) return RecursiveSelect(current->leftChild, position);
     else if(numlower < position) return RecursiveSelect(current->rightChild, position - numlower);
     else return current;
-
-    /*int numlower = GetNodeSize(current->leftChild) + 1;
-
-    if(position == numlower) return current;
-    else if(position < numlower) return RecursiveSelect(current->leftChild, position);
-    else return RecursiveSelect(current->rightChild, position - numlower);*/
 }
 
 // Node size helper
@@ -805,7 +679,7 @@ int RBTree<K, V>::GetNodeSize(Node<K, V>* node)
 template<typename K, typename V>
 int RBTree<K, V>::RankOf(Node<K, V>* node)
 {
-    /*int r = GetNodeSize(node->leftChild) + 1;
+    int r = GetNodeSize(node->leftChild) + 1;
 
     Node<K, V>* current = node;
 
@@ -815,7 +689,7 @@ int RBTree<K, V>::RankOf(Node<K, V>* node)
         current = current->parent;
     }
 
-    return r;*/
+    return r;
     return 0;
 }
 

@@ -435,9 +435,9 @@ public:
       fixRedRed(newNode);
     }
 
-    cout << endl;
-    inorder(root);
-    cout << endl;
+    //cout << endl;
+    //inorder(root);
+    //cout << endl;
   }
  
   // utility function that deletes the node with given value
@@ -480,7 +480,7 @@ public:
 int main() {
   RBTree tree;
  
-  tree.insert(7);
+  /*tree.insert(7);
   tree.insert(3);
   tree.insert(18);
   tree.insert(10);
@@ -501,9 +501,15 @@ int main() {
   tree.deleteByVal(11);
   tree.deleteByVal(3);
   tree.deleteByVal(10);
-  tree.deleteByVal(22);
+  tree.deleteByVal(22);*/
+
+  for(int i = 0; i < 50; i++) tree.insert(i);
+
+  tree.printInOrder();
+
+  for(int i = 0; i < 25; i++) tree.deleteByVal(i);
  
   tree.printInOrder();
-  tree.printLevelOrder();
+  //tree.printLevelOrder();
   return 0;
 }
