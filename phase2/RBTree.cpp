@@ -671,22 +671,6 @@ void RBTree<K, V>::SetRanks(Node<K, V>* current, int currentRank)
     if(current->leftChild != NULL) SetRanks(current->leftChild, currentRank + 1);
 }
 
-// Recursive function to set number of children of node
-template<typename K, typename V>
-void RBTree<K, V>::SetChildrenNumbers(Node<K, V>* current)
-{
-    // Reset values
-    current->numChildrenLeft = 0;
-    current->numChildrenRight = 0;
-
-    // Recursive calls to children
-    if(current->leftChild != NULL) SetChildrenNumbers(current->leftChild);
-    if(current->rightChild != NULL) SetChildrenNumbers(current->rightChild);
-
-    // Set number for node
-    current->numChildrenLeft = current->leftChild->numChildrenLeft + current->leftChild->numChildrenRight + 1;
-}
-
 // Recursive select helper
 template<typename K, typename V>
 Node<K, V>* RBTree<K, V>::RecursiveSelect(Node<K, V>* current, int position)

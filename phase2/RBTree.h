@@ -25,8 +25,7 @@ class Node {
 
         NodeColor color = NodeColor::RED;
         int rank = 0;
-        int numChildrenLeft = 0;
-        int numChildrenRight = 0;
+        int nodeSize = 0;
 
         Node<K, V>* leftChild = NULL;
         Node<K, V>* rightChild = NULL;
@@ -143,9 +142,6 @@ class RBTree
 
         // Recursive function to set ranks
         void SetRanks(Node<K, V>* current, int currentRank);
-
-        // Recursive function to set number of children of node
-        void SetChildrenNumbers(Node<K, V>* current);
 
         // Recursive select helper
         Node<K, V>* RecursiveSelect(Node<K, V>* current, int position);
