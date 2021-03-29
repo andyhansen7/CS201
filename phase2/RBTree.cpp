@@ -512,7 +512,7 @@ void RBTree<K, V>::Delete(Node<K, V>* node)
     // Node is a leaf node
     if(replacementnode == NULL) {
         // Reset root if it is being deleted
-        if (node == _root) _root = NULL;
+        if(node == _root) _root = NULL;
         
         else {
             // Fix double black case
@@ -521,18 +521,18 @@ void RBTree<K, V>::Delete(Node<K, V>* node)
             // One of them is red
             else {
                 // Set sibling to red
-                if (GetSibling(node) != NULL) GetSibling(node)->color = NodeColor::RED;
+                if(GetSibling(node) != NULL) GetSibling(node)->color = NodeColor::RED;
             }
  
             // Delete node from tree
-            if(IsLeftChild(node)) parent->leftChild = NULL;
-            else parent->rightChild = NULL;
-        }
-
-        // Update children count
-        if(node->parent != NULL) {
-            if(IsLeftChild(node)) node->parent->numLeft--;
-            else node->parent->numRight--;
+            if(IsLeftChild(node)) {
+                parent->leftChild = NULL;
+                parent->numLeft = 0;
+            }
+            else {
+                parent->rightChild = NULL;
+                parent->numRight = 0;
+            }
         }
         
         delete node;
@@ -543,28 +543,30 @@ void RBTree<K, V>::Delete(Node<K, V>* node)
     if(node->leftChild == NULL || node->rightChild == NULL) {
 
         // Node is root, replace values
-        if (node == _root) {
+        if(node == _root) {
             node->key = replacementnode->key;
             node->value = replacementnode->value;
-            node->leftChild = node->rightChild = NULL;
-
-            // Update children count
-            if(replacementnode->parent != NULL) {
-                if(IsLeftChild(replacementnode)) replacementnode->parent->numLeft--;
-                else replacementnode->parent->numRight--;
-            }
+            node->leftChild = NULL;
+            node->rightChild = NULL;
+            node->numLeft = 0;
+            node->numRight = 0;
 
             delete replacementnode;
         } 
+
         // Detach node from tree
         else {
-            if (IsLeftChild(node)) parent->leftChild = replacementnode;
-            else parent->rightChild = replacementnode;
-
-            // Update children count
-            if(replacementnode->parent != NULL) {
-                if(IsLeftChild(replacementnode)) replacementnode->parent->numLeft--;
-                else replacementnode->parent->numRight--;
+            if(IsLeftChild(node)) {
+                parent->leftChild = replacementnode;
+                if(replacementnode->leftChild != NULL) replacementnode->numLeft = replacementnode->leftChild->numLeft + replacementnode->leftChild->numRight + 1;
+                if(replacementnode->rightChild != NULL) replacementnode->numRight = replacementnode->rightChild->numLeft + replacementnode->rightChild->numRight + 1;
+                parent->numLeft = replacementnode->numLeft + replacementnode->numRight + 1;
+            }
+            else {
+                parent->rightChild = replacementnode;
+                if(replacementnode->leftChild != NULL) replacementnode->numLeft = replacementnode->leftChild->numLeft + replacementnode->leftChild->numRight + 1;
+                if(replacementnode->rightChild != NULL) replacementnode->numRight = replacementnode->rightChild->numLeft + replacementnode->rightChild->numRight + 1;
+                parent->numRight = replacementnode->numLeft + replacementnode->numRight + 1;
             }
             
             replacementnode->parent = parent;
