@@ -364,14 +364,14 @@ void RBTree<K, V>::LeftRotation(Node<K, V>* node)
     Node<K, V>* node_parent = node->rightChild;
  
     // If node is root, just update it
-    if (node == _root) _root = node_parent;
+    if(node == _root) _root = node_parent;
 
     // The shift
     ShiftDown(node, node_parent);
  
     node->rightChild = node_parent->leftChild;
 
-    if (node_parent->leftChild != NULL) node_parent->leftChild->parent = node;
+    if(node_parent->leftChild != NULL) node_parent->leftChild->parent = node;
 
     node_parent->leftChild = node;
 
@@ -386,10 +386,12 @@ void RBTree<K, V>::LeftRotation(Node<K, V>* node)
     if(node_parent->leftChild != NULL) node_parent->numLeft += node_parent->leftChild->numLeft + node_parent->leftChild->numRight + 1;
     if(node_parent->rightChild != NULL) node_parent->numRight += node_parent->rightChild->numLeft + node_parent->rightChild->numRight + 1;
 
-    node_parent->parent->numLeft = 0;
-    node_parent->parent->numRight = 0;
-    if(node_parent->parent->leftChild != NULL) node_parent->parent->numLeft += node_parent->parent->leftChild->numLeft + node_parent->parent->leftChild->numRight + 1;
-    if(node_parent->parent->rightChild != NULL) node_parent->parent->numRight += node_parent->parent->rightChild->numLeft + node_parent->parent->rightChild->numRight + 1;
+    if(node_parent->parent != NULL) {
+        node_parent->parent->numLeft = 0;
+        node_parent->parent->numRight = 0;
+        if(node_parent->parent->leftChild != NULL) node_parent->parent->numLeft += node_parent->parent->leftChild->numLeft + node_parent->parent->leftChild->numRight + 1;
+        if(node_parent->parent->rightChild != NULL) node_parent->parent->numRight += node_parent->parent->rightChild->numLeft + node_parent->parent->rightChild->numRight + 1;
+    } 
 }
 
 template<typename K, typename V>
@@ -399,14 +401,14 @@ void RBTree<K, V>::RightRotation(Node<K, V>* node)
     Node<K, V>* node_parent = node->leftChild;
  
     // If node is root, just update it
-    if (node == _root) _root = node_parent;
+    if(node == _root) _root = node_parent;
  
     // The shift
     ShiftDown(node, node_parent);
  
     node->leftChild = node_parent->rightChild;
 
-    if (node_parent->rightChild != NULL) node_parent->rightChild->parent = node;
+    if(node_parent->rightChild != NULL) node_parent->rightChild->parent = node;
  
     node_parent->rightChild = node;
 
@@ -421,10 +423,12 @@ void RBTree<K, V>::RightRotation(Node<K, V>* node)
     if(node_parent->leftChild != NULL) node_parent->numLeft += node_parent->leftChild->numLeft + node_parent->leftChild->numRight + 1;
     if(node_parent->rightChild != NULL) node_parent->numRight += node_parent->rightChild->numLeft + node_parent->rightChild->numRight + 1;
 
-    node_parent->parent->numLeft = 0;
-    node_parent->parent->numRight = 0;
-    if(node_parent->parent->leftChild != NULL) node_parent->parent->numLeft += node_parent->parent->leftChild->numLeft + node_parent->parent->leftChild->numRight + 1;
-    if(node_parent->parent->rightChild != NULL) node_parent->parent->numRight += node_parent->parent->rightChild->numLeft + node_parent->parent->rightChild->numRight + 1;
+    if(node_parent->parent != NULL) {
+        node_parent->parent->numLeft = 0;
+        node_parent->parent->numRight = 0;
+        if(node_parent->parent->leftChild != NULL) node_parent->parent->numLeft += node_parent->parent->leftChild->numLeft + node_parent->parent->leftChild->numRight + 1;
+        if(node_parent->parent->rightChild != NULL) node_parent->parent->numRight += node_parent->parent->rightChild->numLeft + node_parent->parent->rightChild->numRight + 1;
+    }
 }
 
 template<typename K, typename V>
@@ -742,7 +746,9 @@ int RBTree<K, V>::GetNodeSize(Node<K, V>* node)
 {
     if(node == NULL) return 0;
 
-    return 1 + GetNodeSize(node->leftChild) + GetNodeSize(node->rightChild);
+    //return 1 + GetNodeSize(node->leftChild) + GetNodeSize(node->rightChild);
+    // New method in O(1) time
+    return 1 + node->numLeft + node->numRight;
 }
 
 // Rank helper
