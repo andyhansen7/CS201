@@ -243,11 +243,13 @@ Node<K, V>* RBTree<K, V>::RecursiveInsert(Node<K, V>* root, Node<K, V>* newnode)
 
     // Insert on left subtree
     if (newnode->key < root->key) { 
+        root->numLeft++;
         root->leftChild = RecursiveInsert(root->leftChild, newnode); 
         root->leftChild->parent = root; 
     } 
     // Insert on right subtree
     else if (newnode->key > root->key) { 
+        root->numRight++;
         root->rightChild = RecursiveInsert(root->rightChild, newnode); 
         root->rightChild->parent = root; 
     } 
@@ -372,6 +374,22 @@ void RBTree<K, V>::LeftRotation(Node<K, V>* node)
     if (node_parent->leftChild != NULL) node_parent->leftChild->parent = node;
 
     node_parent->leftChild = node;
+
+    // Update children counts
+    node->numLeft = 0;
+    node->numRight = 0;
+    if(node->leftChild != NULL) node->numLeft += node->leftChild->numLeft + node->leftChild->numRight + 1;
+    if(node->rightChild != NULL) node->numRight += node->rightChild->numLeft + node->rightChild->numRight + 1;
+
+    node_parent->numLeft = 0;
+    node_parent->numRight = 0;
+    if(node_parent->leftChild != NULL) node_parent->numLeft += node_parent->leftChild->numLeft + node_parent->leftChild->numRight + 1;
+    if(node_parent->rightChild != NULL) node_parent->numRight += node_parent->rightChild->numLeft + node_parent->rightChild->numRight + 1;
+
+    node_parent->parent->numLeft = 0;
+    node_parent->parent->numRight = 0;
+    if(node_parent->parent->leftChild != NULL) node_parent->parent->numLeft += node_parent->parent->leftChild->numLeft + node_parent->parent->leftChild->numRight + 1;
+    if(node_parent->parent->rightChild != NULL) node_parent->parent->numRight += node_parent->parent->rightChild->numLeft + node_parent->parent->rightChild->numRight + 1;
 }
 
 template<typename K, typename V>
@@ -391,6 +409,22 @@ void RBTree<K, V>::RightRotation(Node<K, V>* node)
     if (node_parent->rightChild != NULL) node_parent->rightChild->parent = node;
  
     node_parent->rightChild = node;
+
+    // Update children counts
+    node->numLeft = 0;
+    node->numRight = 0;
+    if(node->leftChild != NULL) node->numLeft += node->leftChild->numLeft + node->leftChild->numRight + 1;
+    if(node->rightChild != NULL) node->numRight += node->rightChild->numLeft + node->rightChild->numRight + 1;
+
+    node_parent->numLeft = 0;
+    node_parent->numRight = 0;
+    if(node_parent->leftChild != NULL) node_parent->numLeft += node_parent->leftChild->numLeft + node_parent->leftChild->numRight + 1;
+    if(node_parent->rightChild != NULL) node_parent->numRight += node_parent->rightChild->numLeft + node_parent->rightChild->numRight + 1;
+
+    node_parent->parent->numLeft = 0;
+    node_parent->parent->numRight = 0;
+    if(node_parent->parent->leftChild != NULL) node_parent->parent->numLeft += node_parent->parent->leftChild->numLeft + node_parent->parent->leftChild->numRight + 1;
+    if(node_parent->parent->rightChild != NULL) node_parent->parent->numRight += node_parent->parent->rightChild->numLeft + node_parent->parent->rightChild->numRight + 1;
 }
 
 template<typename K, typename V>
@@ -489,10 +523,16 @@ void RBTree<K, V>::Delete(Node<K, V>* node)
             // Delete node from tree
             if(IsLeftChild(node)) parent->leftChild = NULL;
             else parent->rightChild = NULL;
-      }
+        }
 
-      delete node;
-      return;
+        // Update children count
+        if(node->parent != NULL) {
+            if(IsLeftChild(node)) node->parent->numLeft--;
+            else node->parent->numRight--;
+        }
+        
+        delete node;
+        return;
     }
     
     // Node has only one child
@@ -504,12 +544,24 @@ void RBTree<K, V>::Delete(Node<K, V>* node)
             node->value = replacementnode->value;
             node->leftChild = node->rightChild = NULL;
 
+            // Update children count
+            if(replacementnode->parent != NULL) {
+                if(IsLeftChild(replacementnode)) replacementnode->parent->numLeft--;
+                else replacementnode->parent->numRight--;
+            }
+
             delete replacementnode;
         } 
         // Detach node from tree
         else {
             if (IsLeftChild(node)) parent->leftChild = replacementnode;
             else parent->rightChild = replacementnode;
+
+            // Update children count
+            if(replacementnode->parent != NULL) {
+                if(IsLeftChild(replacementnode)) replacementnode->parent->numLeft--;
+                else replacementnode->parent->numRight--;
+            }
             
             replacementnode->parent = parent;
             delete node;

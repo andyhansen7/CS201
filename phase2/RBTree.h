@@ -26,6 +26,8 @@ class Node {
         NodeColor color = NodeColor::RED;
         int rank = 0;
         int nodeSize = 0;
+        int numLeft = 0;
+        int numRight = 0;
 
         Node<K, V>* leftChild = NULL;
         Node<K, V>* rightChild = NULL;
