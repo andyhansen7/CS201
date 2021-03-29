@@ -130,6 +130,9 @@ class RBTree
 
         // Recursive delete method
         void Delete(Node<K, V>* node);
+        void DeleteFixup(Node<K, V>* node);
+        void Transplant(Node<K, V>* u, Node<K, V>* v);
+        Node<K, V>* TreeMinimum(Node<K, V>* node);
 
         // Double-black correction helper
         void FixDoubleBlack(Node<K, V>* node);
@@ -154,6 +157,9 @@ class RBTree
         // Rank helper
         int RankOf(Node<K, V>* node);
         int RecursiveRank(Node<K, V>* current, K key);
+
+        // Children count helper
+        void UpdateChildren(Node<K, V>* node);
 };  
 
 #endif //_RBTree_H_

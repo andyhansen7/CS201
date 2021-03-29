@@ -137,15 +137,15 @@ K RBTree<K, V>::select(int position)
 {
     if(position < 1 || position > _size) {
         //std::cout << "[ERROR] Call to select() with position out of bounds." << std::endl;
-        return 0;
+        return _root->key;
     }
     else {
         //SetChildrenNumbers(_root);
 
-        Node<K, V>* node = RecursiveSelect(_root, position);
+        Node<K, V>* node = RecursiveSelect(_root, position - 1);
 
         if(node != NULL) return node->key;
-        else return 0;
+        else return _root->key;
     }
 }
 
@@ -242,13 +242,13 @@ Node<K, V>* RBTree<K, V>::RecursiveInsert(Node<K, V>* root, Node<K, V>* newnode)
     if(root == NULL) return newnode;
 
     // Insert on left subtree
-    if (newnode->key < root->key) { 
+    if(newnode->key < root->key) { 
         root->numLeft++;
         root->leftChild = RecursiveInsert(root->leftChild, newnode); 
         root->leftChild->parent = root; 
     } 
     // Insert on right subtree
-    else if (newnode->key > root->key) { 
+    else if(newnode->key > root->key) { 
         root->numRight++;
         root->rightChild = RecursiveInsert(root->rightChild, newnode); 
         root->rightChild->parent = root; 
@@ -339,7 +339,7 @@ void RBTree<K, V>::SwitchColors(Node<K, V>* a, Node<K, V>* b)
 template<typename K, typename V>
 void RBTree<K, V>::ShiftDown(Node<K, V>* node, Node<K, V>* node_parent)
 {
-    if (node->parent != NULL) {
+    if(node->parent != NULL) {
         if (IsLeftChild(node)) node->parent->leftChild = node_parent;
         else node->parent->rightChild = node_parent;
     }
@@ -376,22 +376,28 @@ void RBTree<K, V>::LeftRotation(Node<K, V>* node)
     node_parent->leftChild = node;
 
     // Update children counts
-    node->numLeft = 0;
-    node->numRight = 0;
-    if(node->leftChild != NULL) node->numLeft += node->leftChild->numLeft + node->leftChild->numRight + 1;
-    if(node->rightChild != NULL) node->numRight += node->rightChild->numLeft + node->rightChild->numRight + 1;
+    UpdateChildren(node->leftChild);
+    UpdateChildren(node->rightChild);
+    UpdateChildren(node);
 
-    node_parent->numLeft = 0;
-    node_parent->numRight = 0;
-    if(node_parent->leftChild != NULL) node_parent->numLeft += node_parent->leftChild->numLeft + node_parent->leftChild->numRight + 1;
-    if(node_parent->rightChild != NULL) node_parent->numRight += node_parent->rightChild->numLeft + node_parent->rightChild->numRight + 1;
+    Node<K, V>* temp = GetSibling(node);
+    if(temp != NULL) {
+        UpdateChildren(temp->leftChild);
+        UpdateChildren(temp->rightChild);
+        UpdateChildren(temp);
+    }
 
-    if(node_parent->parent != NULL) {
-        node_parent->parent->numLeft = 0;
-        node_parent->parent->numRight = 0;
-        if(node_parent->parent->leftChild != NULL) node_parent->parent->numLeft += node_parent->parent->leftChild->numLeft + node_parent->parent->leftChild->numRight + 1;
-        if(node_parent->parent->rightChild != NULL) node_parent->parent->numRight += node_parent->parent->rightChild->numLeft + node_parent->parent->rightChild->numRight + 1;
-    } 
+    //UpdateChildren(node_parent->leftChild);
+    UpdateChildren(node_parent->rightChild);
+    
+    temp = node_parent;
+    while(temp != NULL) {
+        UpdateChildren(temp->rightChild);
+        UpdateChildren(temp->leftChild);
+        UpdateChildren(temp);
+
+        temp = temp->parent;
+    }
 }
 
 template<typename K, typename V>
@@ -413,21 +419,24 @@ void RBTree<K, V>::RightRotation(Node<K, V>* node)
     node_parent->rightChild = node;
 
     // Update children counts
-    node->numLeft = 0;
-    node->numRight = 0;
-    if(node->leftChild != NULL) node->numLeft += node->leftChild->numLeft + node->leftChild->numRight + 1;
-    if(node->rightChild != NULL) node->numRight += node->rightChild->numLeft + node->rightChild->numRight + 1;
+    UpdateChildren(node->leftChild);
+    UpdateChildren(node->rightChild);
+    UpdateChildren(node);
 
-    node_parent->numLeft = 0;
-    node_parent->numRight = 0;
-    if(node_parent->leftChild != NULL) node_parent->numLeft += node_parent->leftChild->numLeft + node_parent->leftChild->numRight + 1;
-    if(node_parent->rightChild != NULL) node_parent->numRight += node_parent->rightChild->numLeft + node_parent->rightChild->numRight + 1;
+    Node<K, V>* temp = GetSibling(node);
+    if(temp != NULL) {
+        UpdateChildren(temp->leftChild);
+        UpdateChildren(temp->rightChild);
+        UpdateChildren(temp);
+    }
 
-    if(node_parent->parent != NULL) {
-        node_parent->parent->numLeft = 0;
-        node_parent->parent->numRight = 0;
-        if(node_parent->parent->leftChild != NULL) node_parent->parent->numLeft += node_parent->parent->leftChild->numLeft + node_parent->parent->leftChild->numRight + 1;
-        if(node_parent->parent->rightChild != NULL) node_parent->parent->numRight += node_parent->parent->rightChild->numLeft + node_parent->parent->rightChild->numRight + 1;
+    UpdateChildren(node_parent->leftChild);
+    //UpdateChildren(node_parent->rightChild);
+
+    temp = node_parent;
+    while(temp != NULL) {
+        UpdateChildren(temp);
+        temp = temp->parent;
     }
 }
 
@@ -436,7 +445,7 @@ template<typename K, typename V>
 Node<K, V>* RBTree<K, V>::GetClosest(Node<K, V>* node)
 {
     // If node has 2 children
-    if(node->leftChild != NULL && node->rightChild != NULL) return LeftmostNode(node->rightChild);
+    if(node->leftChild != NULL && node->rightChild != NULL) return RightmostNode(node->leftChild);//return LeftmostNode(node->rightChild);
  
     // If node is leaf node
     else if(node->leftChild == NULL && node->rightChild == NULL) return NULL;
@@ -528,10 +537,24 @@ void RBTree<K, V>::Delete(Node<K, V>* node)
             if(IsLeftChild(node)) {
                 parent->leftChild = NULL;
                 parent->numLeft = 0;
+
+                // Propogate upwards
+                Node<K, V>* temp = parent->parent;
+                while(temp != NULL) {
+                    UpdateChildren(temp);
+                    temp = temp->parent;
+                }
             }
             else {
                 parent->rightChild = NULL;
                 parent->numRight = 0;
+
+                // Propogate upwards
+                Node<K, V>* temp = parent->parent;
+                while(temp != NULL) {
+                    UpdateChildren(temp);
+                    temp = temp->parent;
+                }
             }
         }
         
@@ -540,7 +563,7 @@ void RBTree<K, V>::Delete(Node<K, V>* node)
     }
     
     // Node has only one child
-    if(node->leftChild == NULL || node->rightChild == NULL) {
+    if((node->leftChild == NULL) || (node->rightChild == NULL)) {
 
         // Node is root, replace values
         if(node == _root) {
@@ -558,15 +581,39 @@ void RBTree<K, V>::Delete(Node<K, V>* node)
         else {
             if(IsLeftChild(node)) {
                 parent->leftChild = replacementnode;
-                if(replacementnode->leftChild != NULL) replacementnode->numLeft = replacementnode->leftChild->numLeft + replacementnode->leftChild->numRight + 1;
-                if(replacementnode->rightChild != NULL) replacementnode->numRight = replacementnode->rightChild->numLeft + replacementnode->rightChild->numRight + 1;
-                parent->numLeft = replacementnode->numLeft + replacementnode->numRight + 1;
+
+                Node<K, V>* left = replacementnode->leftChild;
+                Node<K, V>* right = replacementnode->rightChild;
+
+                UpdateChildren(left);
+                UpdateChildren(right);
+                UpdateChildren(replacementnode);
+                UpdateChildren(parent);
+                
+                // Propogate upwards
+                Node<K, V>* temp = parent->parent;
+                while(temp != NULL) {
+                    UpdateChildren(temp);
+                    temp = temp->parent;
+                }
             }
             else {
                 parent->rightChild = replacementnode;
-                if(replacementnode->leftChild != NULL) replacementnode->numLeft = replacementnode->leftChild->numLeft + replacementnode->leftChild->numRight + 1;
-                if(replacementnode->rightChild != NULL) replacementnode->numRight = replacementnode->rightChild->numLeft + replacementnode->rightChild->numRight + 1;
-                parent->numRight = replacementnode->numLeft + replacementnode->numRight + 1;
+                
+                Node<K, V>* left = replacementnode->leftChild;
+                Node<K, V>* right = replacementnode->rightChild;
+
+                UpdateChildren(left);
+                UpdateChildren(right);
+                UpdateChildren(replacementnode);
+                UpdateChildren(parent);
+                
+                // Propogate upwards
+                Node<K, V>* temp = parent->parent;
+                while(temp != NULL) {
+                    UpdateChildren(temp);
+                    temp = temp->parent;
+                }
             }
             
             replacementnode->parent = parent;
@@ -594,6 +641,105 @@ void RBTree<K, V>::Delete(Node<K, V>* node)
     Delete(replacementnode);
 }
 
+template<typename K, typename V>
+void RBTree<K, V>::DeleteFixup(Node<K, V>* node)
+{
+    Node<K, V>* x = node;
+
+    while(x != _root && x->color == NodeColor::BLACK) {
+        if(IsLeftChild(node)) {
+            Node<K, V>* w = GetSibling(x);
+            UpdateChildren(w);
+
+            if(w->color == NodeColor::RED) {
+                w->color = NodeColor::BLACK;
+                x->parent->color = NodeColor::RED;
+
+                LeftRotation(x->parent);
+
+                w = x->parent->rightChild;
+            }
+
+            if(w->leftChild->color == NodeColor::BLACK && w->rightChild->color == NodeColor::BLACK) {
+                w->color = NodeColor::RED;
+                x = x->parent;
+            }
+
+            else if(w->rightChild->color == NodeColor::BLACK) {
+                w->leftChild->color = NodeColor::BLACK;
+                w->color = NodeColor::RED;
+
+                RightRotation(w);
+
+                w = x->parent->rightChild;
+                w->color = x->parent->color;
+                x->parent->color = NodeColor::BLACK;
+                w->rightChild->color = NodeColor::BLACK;
+                LeftRotation(x->parent);
+                x = _root;
+            }
+        }
+
+        else {
+            Node<K, V>* w = GetSibling(x);
+            UpdateChildren(w);
+
+            if(w->color == NodeColor::RED) {
+                w->color = NodeColor::BLACK;
+                x->parent->color = NodeColor::RED;
+
+                RightRotation(x->parent);
+
+                w = x->parent->leftChild;
+            }
+
+            if(w->rightChild->color == NodeColor::BLACK && w->leftChild->color == NodeColor::BLACK) {
+                w->color = NodeColor::RED;
+                x = x->parent;
+            }
+
+            else if(w->leftChild->color == NodeColor::BLACK) {
+                w->rightChild->color = NodeColor::BLACK;
+                w->color = NodeColor::RED;
+
+                LeftRotation(w);
+
+                w = x->parent->leftChild;
+                w->color = x->parent->color;
+                x->parent->color = NodeColor::BLACK;
+                w->leftChild->color = NodeColor::BLACK;
+                RightRotation(x->parent);
+                x = _root;
+            }
+        }
+    }
+
+    x->color = NodeColor::BLACK;
+}
+
+template<typename K, typename V>
+void RBTree<K, V>::Transplant(Node<K, V>* u, Node<K, V>* v)
+{
+    if(u->parent == NULL) _root = v;
+    else if(IsLeftChild(u)) u->parent->leftChild = v;
+    else u->parent->rightChild = v;
+    
+    v->parent = u->parent;
+
+    UpdateChildren(u);
+    UpdateChildren(v);
+    UpdateChildren(u->parent);
+}
+template<typename K, typename V>
+Node<K, V>* RBTree<K, V>::TreeMinimum(Node<K, V>* node)
+{
+    Node<K, V>* x = node;
+
+    while(x->leftChild != NULL) x = x->leftChild;
+
+    return x;
+}
+
 // Double-black correction helper
 template<typename K, typename V>
 void RBTree<K, V>::FixDoubleBlack(Node<K, V>* node)
@@ -602,7 +748,6 @@ void RBTree<K, V>::FixDoubleBlack(Node<K, V>* node)
     if(node == _root) return;
  
     Node<K, V>* sibling = GetSibling(node);
-    //Node<K, V>* parent = node->parent;
 
     // If no sibling, recurse on parent
     if(sibling == NULL) FixDoubleBlack(node->parent);
@@ -735,10 +880,14 @@ Node<K, V>* RBTree<K, V>::RecursiveSelect(Node<K, V>* current, int position)
 {
     if(current == NULL) return NULL;
 
-    int numlower = GetNodeSize(current->leftChild) + 1;
+    UpdateChildren(current);
+    UpdateChildren(current->leftChild);
+    UpdateChildren(current->rightChild);
+
+    int numlower = current->numLeft;// + 1;GetNodeSize(current->leftChild) + 1;
 
     if(numlower > position) return RecursiveSelect(current->leftChild, position);
-    else if(numlower < position) return RecursiveSelect(current->rightChild, position - numlower);
+    else if(numlower < position) return RecursiveSelect(current->rightChild, position - numlower - 1);
     else return current;
 }
 
@@ -750,7 +899,7 @@ int RBTree<K, V>::GetNodeSize(Node<K, V>* node)
 
     //return 1 + GetNodeSize(node->leftChild) + GetNodeSize(node->rightChild);
     // New method in O(1) time
-    return 1 + node->numLeft + node->numRight;
+    return (1 + node->numLeft + node->numRight);
 }
 
 // Rank helper
@@ -768,7 +917,6 @@ int RBTree<K, V>::RankOf(Node<K, V>* node)
     }
 
     return r;
-    return 0;
 }
 
 template<typename K, typename V>
@@ -779,4 +927,16 @@ int RBTree<K, V>::RecursiveRank(Node<K, V>* current, K key)
     if(current->key > key) return RecursiveRank(current->leftChild, key);
     else if (current->key < key) return 1 + GetNodeSize(current->leftChild) + RecursiveRank(current->rightChild, key); 
     else return GetNodeSize(current->leftChild); 
+}
+
+template<typename K, typename V>
+void RBTree<K, V>::UpdateChildren(Node<K, V>* node)
+{
+    if(node == NULL) return;
+
+    node->numLeft = 0;
+    node->numRight = 0;
+
+    if(node->leftChild != NULL) node->numLeft = node->leftChild->numLeft + node->leftChild->numRight + 1;
+    if(node->rightChild != NULL) node->numRight = node->rightChild->numLeft + node->rightChild->numRight + 1;
 }
