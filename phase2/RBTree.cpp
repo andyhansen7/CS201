@@ -641,105 +641,6 @@ void RBTree<K, V>::Delete(Node<K, V>* node)
     Delete(replacementnode);
 }
 
-template<typename K, typename V>
-void RBTree<K, V>::DeleteFixup(Node<K, V>* node)
-{
-    Node<K, V>* x = node;
-
-    while(x != _root && x->color == NodeColor::BLACK) {
-        if(IsLeftChild(node)) {
-            Node<K, V>* w = GetSibling(x);
-            UpdateChildren(w);
-
-            if(w->color == NodeColor::RED) {
-                w->color = NodeColor::BLACK;
-                x->parent->color = NodeColor::RED;
-
-                LeftRotation(x->parent);
-
-                w = x->parent->rightChild;
-            }
-
-            if(w->leftChild->color == NodeColor::BLACK && w->rightChild->color == NodeColor::BLACK) {
-                w->color = NodeColor::RED;
-                x = x->parent;
-            }
-
-            else if(w->rightChild->color == NodeColor::BLACK) {
-                w->leftChild->color = NodeColor::BLACK;
-                w->color = NodeColor::RED;
-
-                RightRotation(w);
-
-                w = x->parent->rightChild;
-                w->color = x->parent->color;
-                x->parent->color = NodeColor::BLACK;
-                w->rightChild->color = NodeColor::BLACK;
-                LeftRotation(x->parent);
-                x = _root;
-            }
-        }
-
-        else {
-            Node<K, V>* w = GetSibling(x);
-            UpdateChildren(w);
-
-            if(w->color == NodeColor::RED) {
-                w->color = NodeColor::BLACK;
-                x->parent->color = NodeColor::RED;
-
-                RightRotation(x->parent);
-
-                w = x->parent->leftChild;
-            }
-
-            if(w->rightChild->color == NodeColor::BLACK && w->leftChild->color == NodeColor::BLACK) {
-                w->color = NodeColor::RED;
-                x = x->parent;
-            }
-
-            else if(w->leftChild->color == NodeColor::BLACK) {
-                w->rightChild->color = NodeColor::BLACK;
-                w->color = NodeColor::RED;
-
-                LeftRotation(w);
-
-                w = x->parent->leftChild;
-                w->color = x->parent->color;
-                x->parent->color = NodeColor::BLACK;
-                w->leftChild->color = NodeColor::BLACK;
-                RightRotation(x->parent);
-                x = _root;
-            }
-        }
-    }
-
-    x->color = NodeColor::BLACK;
-}
-
-template<typename K, typename V>
-void RBTree<K, V>::Transplant(Node<K, V>* u, Node<K, V>* v)
-{
-    if(u->parent == NULL) _root = v;
-    else if(IsLeftChild(u)) u->parent->leftChild = v;
-    else u->parent->rightChild = v;
-    
-    v->parent = u->parent;
-
-    UpdateChildren(u);
-    UpdateChildren(v);
-    UpdateChildren(u->parent);
-}
-template<typename K, typename V>
-Node<K, V>* RBTree<K, V>::TreeMinimum(Node<K, V>* node)
-{
-    Node<K, V>* x = node;
-
-    while(x->leftChild != NULL) x = x->leftChild;
-
-    return x;
-}
-
 // Double-black correction helper
 template<typename K, typename V>
 void RBTree<K, V>::FixDoubleBlack(Node<K, V>* node)
@@ -864,16 +765,6 @@ void RBTree<K, V>::PostorderRecursive(Node<K, V>* node)
     std::cout << node->key << " ";
 }
 
-// Recursive function to set ranks
-template<typename K, typename V>
-void RBTree<K, V>::SetRanks(Node<K, V>* current, int currentRank) 
-{
-    current->rank = currentRank + 1;
-
-    if(current->rightChild != NULL) SetRanks(current->rightChild, currentRank + 1);
-    if(current->leftChild != NULL) SetRanks(current->leftChild, currentRank + 1);
-}
-
 // Recursive select helper
 template<typename K, typename V>
 Node<K, V>* RBTree<K, V>::RecursiveSelect(Node<K, V>* current, int position)
@@ -903,22 +794,6 @@ int RBTree<K, V>::GetNodeSize(Node<K, V>* node)
 }
 
 // Rank helper
-template<typename K, typename V>
-int RBTree<K, V>::RankOf(Node<K, V>* node)
-{
-    int r = GetNodeSize(node->leftChild) + 1;
-
-    Node<K, V>* current = node;
-
-    while(current != _root) {
-        if(!IsLeftChild(current)) r += (GetNodeSize(current->parent->leftChild) + 1);
-
-        current = current->parent;
-    }
-
-    return r;
-}
-
 template<typename K, typename V>
 int RBTree<K, V>::RecursiveRank(Node<K, V>* current, K key)
 {
