@@ -9,11 +9,10 @@
 #ifndef _HEAP_H_
 #define _HEAP_H_
 
-#define KEYTYPE int
-
 #include <iostream>
 #include "CDA.cpp"
 
+template<typename K>
 class Heap
 {
     public:
@@ -21,27 +20,27 @@ class Heap
         Heap();
 
         // Array constructor
-        Heap(KEYTYPE k[], int s);
+        Heap(K k[], int s);
 
         // Destructor
         ~Heap();
 
         // Return minimum value of heap without modification to heap
-        KEYTYPE peekKey();
+        K peekKey();
 
         // Remove minimum and return value
-        KEYTYPE extractMin();
+        K extractMin();
 
         // Insert key into heap
-        void insert(KEYTYPE k);
+        void insert(K k);
 
         // Write keys starting at root
         void printKey();
 
     private:
-        CDA<KEYTYPE>* _array;
+        CDA<K>* _array;
 
-        KEYTYPE _sentinel;
+        K _sentinel;
 
         int _size;
 

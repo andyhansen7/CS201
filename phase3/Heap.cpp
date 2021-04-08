@@ -9,17 +9,19 @@
 #include "Heap.h"
 
 // Default constructor
-Heap::Heap()
+template<typename K>
+Heap<K>::Heap()
     : _size(0)
 {
-    _array = new CDA<KEYTYPE>();
+    _array = new CDA<K>();
 }
 
 // Array constructor
-Heap::Heap(KEYTYPE k[], int s)
+template<typename K>
+Heap<K>::Heap(K k[], int s)
     : _size(0)
 {
-    _array = new CDA<KEYTYPE>();
+    _array = new CDA<K>();
 
     for(int i = 0; i < s; i++)
     {
@@ -28,27 +30,30 @@ Heap::Heap(KEYTYPE k[], int s)
 }
 
 // Destructor
-Heap::~Heap()
+template<typename K>
+Heap<K>::~Heap()
 {
     delete _array;
 }
 
 // Return minimum value of heap without modification to heap
-KEYTYPE Heap::peekKey()
+template<typename K>
+K Heap<K>::peekKey()
 {
     // Minimum stored at beginning of array
     return (_array->operator[](0));
 }
 
 // Remove minimum and return value
-KEYTYPE Heap::extractMin()
+template<typename K>
+K Heap<K>::extractMin()
 {
     // Safety checks
     if(_size < 1) return _sentinel;
 
     // Only one node
     else if(_size == 1) {
-        KEYTYPE min = (_array->operator[](0));
+        K min = (_array->operator[](0));
         _array->DelFront();
         _size--;
         return min;
@@ -56,7 +61,7 @@ KEYTYPE Heap::extractMin()
 
     // All other cases
     else {
-        KEYTYPE min = (_array->operator[](0));
+        K min = (_array->operator[](0));
         _array->operator[](0) = _array->operator[](_size - 1);
         _size--;
 
@@ -67,7 +72,8 @@ KEYTYPE Heap::extractMin()
 }
 
 // Insert key into heap
-void Heap::insert(KEYTYPE k)
+template<typename K>
+void Heap<K>::insert(K k)
 {
     _array->operator[](_size) = k;
 
@@ -78,7 +84,8 @@ void Heap::insert(KEYTYPE k)
 }
 
 // Write keys starting at root
-void Heap::printKey()
+template<typename K>
+void Heap<K>::printKey()
 {
     for(int i = 0; i < _size; i++)
     {
@@ -88,14 +95,15 @@ void Heap::printKey()
     std::cout << std::endl;
 }
 // Helper to swim up or down
-void Heap::SwimUp(int startIndex)
+template<typename K>
+void Heap<K>::SwimUp(int startIndex)
 {
     int i = startIndex;
 
     while(i > 0 && ( _array->operator[](GetParentIndex(i)) > _array->operator[](i) ) )
     {
         // Swap values
-        KEYTYPE temp = _array->operator[](i);
+        K temp = _array->operator[](i);
         _array->operator[](i) = _array->operator[](GetParentIndex(i));
         _array->operator[](GetParentIndex(i)) = temp;
 
@@ -103,7 +111,8 @@ void Heap::SwimUp(int startIndex)
     }
 }
 
-void Heap::ReHeapify(int index)
+template<typename K>
+void Heap<K>::ReHeapify(int index)
 {
     int leftChild = GetLeftChildIndex(index);
     int rightChild = GetRightChildIndex(index);
@@ -113,7 +122,7 @@ void Heap::ReHeapify(int index)
     if(rightChild < _size && _array->operator[](index) < _array->operator[](min)) min = rightChild;
 
     if(min != index) {
-        KEYTYPE temp = _array->operator[](index);
+        K temp = _array->operator[](index);
         _array->operator[](index) = _array->operator[](min);
         _array->operator[](min) = temp;
 
