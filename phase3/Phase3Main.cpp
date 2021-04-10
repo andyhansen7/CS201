@@ -1,7 +1,7 @@
 #include <iostream>
 using namespace std;
 #include "Heap.cpp"
-#include "BHeap.cpp"
+//#include "BHeap.cpp"
 
 
 int main(){
@@ -13,7 +13,10 @@ int main(){
 	T2.printKey();
 	//Should output  1 2 4 3 6 5 8 10 7 9
 	
-	for(int i=0; i<10; i++) T1.insert(B[i]);
+	for(int i=0; i<10; i++) {
+		T1.insert(B[i]);
+		//T1.printKey();
+	}
 	
 	T1.printKey();
 	// Should output 1 2 5 4 3 9 6 10 7 8
