@@ -23,6 +23,12 @@ class Heap
         // Array constructor
         Heap(K k[], int s);
 
+        // Copy constructor
+        Heap(Heap<K>& base);
+
+        // Copy assignment operator
+        Heap<K>& operator=(Heap<K>& base);
+
         // Destructor
         ~Heap();
 
@@ -38,9 +44,10 @@ class Heap
         // Write keys starting at root
         void printKey();
 
-    private:
+    protected:
         CDA<K>* _array;
 
+    private:
         K _sentinel;
 
         int _size;

@@ -29,6 +29,12 @@ int main(){
 	
 	T1.printKey();
 	//Should output 2 3 5 4 8 9 6 10 7
+
+	Heap<int> C(T1);
+	Heap<int> D = C;
+
+	C.printKey();
+	D.printKey();
 	
 	
 	/*BHeap<string> X(A,10), Y;

@@ -31,6 +31,30 @@ Heap<K>::Heap(K k[], int s)
     TopDownBuildHeap();
 }
 
+
+// Copy constructor
+template<typename K>
+Heap<K>::Heap(Heap<K>& base)
+    : _size(base._array->Length())
+{
+    _array = new CDA<K>();
+
+    for(int i = 0; i < base._array->Length(); i++) _array->AddEnd(base._array->operator[](i));
+}
+
+// Copy assignment operator
+template<typename K>
+Heap<K>& Heap<K>::operator=(Heap<K>& base)
+{
+    delete _array;
+    _array = new CDA<K>();
+    _size = base._array->Length();
+
+    for(int i = 0; i < base._array->Length(); i++) _array->AddEnd(base._array->operator[](i));
+
+    return *this;
+}
+
 // Destructor
 template<typename K>
 Heap<K>::~Heap()
@@ -100,6 +124,7 @@ void Heap<K>::printKey()
 
     std::cout << std::endl;
 }
+
 // Helper to swim up or down
 template<typename K>
 void Heap<K>::SwimUp(int startIndex)
