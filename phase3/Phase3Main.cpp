@@ -1,13 +1,14 @@
 #include <iostream>
 using namespace std;
 #include "Heap.cpp"
-//#include "BHeap.cpp"
+#include "BHeap.cpp"
 
 
 int main(){
 	string A[10] = {"A","B","C","D","E","F","H","I","J","K"};
 	int B[10] = {10,9,8,7,6,5,4,3,2,1};
 	
+	/*
 	Heap<int> T1, T2(B,10);
 	
 	T2.printKey();
@@ -35,9 +36,17 @@ int main(){
 
 	C.printKey();
 	D.printKey();
+	*/
+	BHeap x;
+	x.insert(1);
+	x.insert(2);
+	x.insert(3);
+	x.insert(4);
+	x.printKey();
 	
-	
-	/*BHeap<string> X(A,10), Y;
+
+	/*
+	BHeap<string> X(A,10), Y;
 
 	X.printKey();
 	//Should output 
@@ -50,7 +59,7 @@ int main(){
 	cout << X.extractMin() << endl;
 	//Should output A
 	
-	X.printKey():
+	X.printKey();
 	//Should output
 	//B0
 	//B

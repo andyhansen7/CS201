@@ -40,6 +40,12 @@ class BHeap
         // Array constuctor using repeated insertion
         BHeap(KEYTYPE k[], int s);
 
+        // Copy constructor
+        BHeap(BHeap& base);
+
+        // Copy assignment operator
+        BHeap& operator=(BHeap& base);
+
         // Destructor
         ~BHeap();
 
@@ -61,4 +67,14 @@ class BHeap
     private:
         HeapNode* _root;
         int _size;
+
+        KEYTYPE _sentinel;
+
+        HeapNode* mergeHelper(HeapNode* H1, HeapNode* H2);
+        HeapNode* unionHelper(HeapNode* H1, HeapNode* H2);
+        void linkHelper(HeapNode* y, HeapNode* z);
+
+        HeapNode* Revert(HeapNode* y);
+
+        void recursivePrint(HeapNode* node);
 };
