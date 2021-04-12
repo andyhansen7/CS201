@@ -37,7 +37,7 @@ int main(){
 	C.printKey();
 	D.printKey();
 	*/
-	BHeap x;
+	BHeap<int> x;
 	x.insert(1);
 	x.insert(2);
 	x.insert(3);

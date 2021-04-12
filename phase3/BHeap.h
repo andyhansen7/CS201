@@ -8,12 +8,11 @@
 
 #include <iostream>
 
-#define KEYTYPE int
-
+template<typename K>
 class HeapNode
 {
     public:
-        HeapNode(KEYTYPE key)
+        HeapNode(K key)
             : key(key),
               degree(0),
               parent(NULL),
@@ -23,14 +22,15 @@ class HeapNode
 
         }
 
-        KEYTYPE key;
+        K key;
         int degree = 0;
 
-        HeapNode* parent = NULL;
-        HeapNode* child = NULL;
-        HeapNode* rightSibling = NULL;
+        HeapNode<K>* parent = NULL;
+        HeapNode<K>* child = NULL;
+        HeapNode<K>* rightSibling = NULL;
 };
 
+template<typename K>
 class BHeap
 {
     public:
@@ -38,7 +38,7 @@ class BHeap
         BHeap();
 
         // Array constuctor using repeated insertion
-        BHeap(KEYTYPE k[], int s);
+        BHeap(K k[], int s);
 
         // Copy constructor
         BHeap(BHeap& base);
@@ -50,13 +50,13 @@ class BHeap
         ~BHeap();
 
         // Return minimum of heap without modifying the heap
-        KEYTYPE peekKey();
+        K peekKey();
 
         // Remove the minimum key of the heap and return its value
-        KEYTYPE extractMin();
+        K extractMin();
 
         // Insert key k into the tree
-        void insert(KEYTYPE k);
+        void insert(K k);
 
         // Merge heap H2 into the current heap, destructively
         void merge(BHeap& H2);
@@ -65,17 +65,17 @@ class BHeap
         void printKey();
     
     private:
-        HeapNode* _root;
-        HeapNode* _revertNode;
+        HeapNode<K>* _root;
+        HeapNode<K>* _revertNode;
         int _size;
 
-        KEYTYPE _sentinel;
+        K _sentinel;
 
-        HeapNode* mergeHelper(HeapNode* H1, HeapNode* H2);
-        HeapNode* unionHelper(HeapNode* H1, HeapNode* H2);
-        void linkHelper(HeapNode* y, HeapNode* z);
+        HeapNode<K>* mergeHelper(HeapNode<K>* H1, HeapNode<K>* H2);
+        HeapNode<K>* unionHelper(HeapNode<K>* H1, HeapNode<K>* H2);
+        void linkHelper(HeapNode<K>* y, HeapNode<K>* z);
 
-        void revert(HeapNode* y);
+        void revert(HeapNode<K>* y);
 
-        void recursivePrint(HeapNode* node);
+        void recursivePrint(HeapNode<K>* node);
 };

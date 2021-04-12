@@ -9,55 +9,62 @@
 #include "BHeap.h"
 
 // Default constructor with empty heap
-BHeap::BHeap()
+template<typename K>
+BHeap<K>::BHeap()
     : _root(NULL), _revertNode(NULL), _size(0)
 {
 
 }
 
 // Array constructor using repeated insertion
-BHeap::BHeap(KEYTYPE k[], int s)
+template<typename K>
+BHeap<K>::BHeap(K k[], int s)
     : _root(NULL), _revertNode(NULL), _size(0)
 {
     for(int i = 0; i < s; i++) insert(k[i]);
 }
 
 // Copy constructor
-BHeap::BHeap(BHeap& base)
+template<typename K>
+BHeap<K>::BHeap(BHeap<K>& base)
     : _root(NULL), _revertNode(NULL), _size(0)
 {
 
 }
 
 // Copy assignment operator
-BHeap& BHeap::operator=(BHeap& base)
+template<typename K>
+BHeap<K>& BHeap<K>::operator=(BHeap<K>& base)
 {
     return *this;
 }
 
 // Destructor
-BHeap::~BHeap()
+template<typename K>
+BHeap<K>::~BHeap()
 {
 
 }
 
 // Return minimum of heap without modifying the heap
-KEYTYPE BHeap::peekKey()
+template<typename K>
+K BHeap<K>::peekKey()
 {
     return _root->key;
 }
 
 // Remove the minimum key of the heap and return its value
-KEYTYPE BHeap::extractMin()
+template<typename K>
+K BHeap<K>::extractMin()
 {
     _revertNode = NULL;
-    HeapNode* t = NULL;
-    HeapNode* x = _root;
+    HeapNode<K>* t = NULL;
+    HeapNode<K>* x = _root;
 
     if(x == NULL) return _sentinel;
-    KEYTYPE min = x->key;
+    K min = x->key;
 
-    HeapNode* p = x;
+    HeapNode<K>* p = x;
     while (p->rightSibling != NULL)
     {
         if ((p->rightSibling)->key < min)
@@ -87,9 +94,10 @@ KEYTYPE BHeap::extractMin()
 }
 
 // Insert key k into the tree
-void BHeap::insert(KEYTYPE k)
+template<typename K>
+void BHeap<K>::insert(K k)
 {
-    HeapNode* newnode = new HeapNode(k);
+    HeapNode<K>* newnode = new HeapNode<K>(k);
 
     _root = unionHelper(_root, newnode);
 
@@ -97,24 +105,27 @@ void BHeap::insert(KEYTYPE k)
 }
 
 // Merge heap H2 into the current heap, destructively
-void BHeap::merge(BHeap& H2)
+template<typename K>
+void BHeap<K>::merge(BHeap& H2)
 {
     _root = mergeHelper(_root, H2._root);
 }
 
 // Print the keys stored in the heap, starting with the smallest binomial tree first
-void BHeap::printKey()
+template<typename K>
+void BHeap<K>::printKey()
 {
     std::cout << "B" << _root->degree << std::endl;
     recursivePrint(_root);
     std::cout << std::endl;
 }
 
-HeapNode* BHeap::mergeHelper(HeapNode* H1, HeapNode* H2)
+template<typename K>
+HeapNode<K>* BHeap<K>::mergeHelper(HeapNode<K>* H1, HeapNode<K>* H2)
 {
-    HeapNode* newHeap;
-    HeapNode* y = H1;
-    HeapNode* z = H2;
+    HeapNode<K>* newHeap;
+    HeapNode<K>* y = H1;
+    HeapNode<K>* z = H2;
 
     if(y != NULL)
     {
@@ -133,14 +144,14 @@ HeapNode* BHeap::mergeHelper(HeapNode* H1, HeapNode* H2)
         
         else if(y->degree == z->degree)
         {
-            HeapNode* temp = y->rightSibling;
+            HeapNode<K>* temp = y->rightSibling;
             y->rightSibling = z;
             y = temp;
         }
 
         else
         {
-            HeapNode* temp = z->rightSibling;
+            HeapNode<K>* temp = z->rightSibling;
             z->rightSibling = y;
             z = temp;
         }
@@ -149,14 +160,15 @@ HeapNode* BHeap::mergeHelper(HeapNode* H1, HeapNode* H2)
     return newHeap;
 }
 
-HeapNode* BHeap::unionHelper(HeapNode* H1, HeapNode* H2)
+template<typename K>
+HeapNode<K>* BHeap<K>::unionHelper(HeapNode<K>* H1, HeapNode<K>* H2)
 {
-    HeapNode* H = mergeHelper(H1, H2);
+    HeapNode<K>* H = mergeHelper(H1, H2);
     if(H == NULL) return H;
 
-    HeapNode* prev_x;
-    HeapNode* next_x;
-    HeapNode* x;
+    HeapNode<K>* prev_x;
+    HeapNode<K>* next_x;
+    HeapNode<K>* x;
 
     prev_x = NULL;
     x = H;
@@ -192,7 +204,8 @@ HeapNode* BHeap::unionHelper(HeapNode* H1, HeapNode* H2)
     return H;
 }
 
-void BHeap::linkHelper(HeapNode* y, HeapNode* z)
+template<typename K>
+void BHeap<K>::linkHelper(HeapNode<K>* y, HeapNode<K>* z)
 {
     y->parent = z;
     y->rightSibling = z->child;
@@ -200,7 +213,8 @@ void BHeap::linkHelper(HeapNode* y, HeapNode* z)
     z->degree++;
 }
 
-void BHeap::revert(HeapNode* y)
+template<typename K>
+void BHeap<K>::revert(HeapNode<K>* y)
 {
     if (y->rightSibling != NULL)
     {
@@ -213,7 +227,8 @@ void BHeap::revert(HeapNode* y)
     }
 }
 
-void BHeap::recursivePrint(HeapNode* node)
+template<typename K>
+void BHeap<K>::recursivePrint(HeapNode<K>* node)
 {
     std::cout << node->key << " ";
     if(node->child != NULL) recursivePrint(node->child);
