@@ -38,11 +38,13 @@ int main(){
 	D.printKey();
 	*/
 	BHeap<int> x;
-	x.insert(1);
-	x.insert(2);
-	x.insert(3);
-	x.insert(4);
+	for(int i = 1; i < 4; i++) x.insert(i);
 	x.printKey();
+
+	//cout << x.extractMin() << endl;
+	//x.printKey();
+
+	cout << x.peekKey() << endl;
 	
 
 	/*

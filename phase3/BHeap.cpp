@@ -230,7 +230,8 @@ void BHeap<K>::revert(HeapNode<K>* y)
 template<typename K>
 void BHeap<K>::recursivePrint(HeapNode<K>* node)
 {
+    if(node->rightSibling != NULL) recursivePrint(node->rightSibling);
     std::cout << node->key << " ";
     if(node->child != NULL) recursivePrint(node->child);
-    if(node->rightSibling != NULL) recursivePrint(node->rightSibling);
+    //if(node->rightSibling != NULL) recursivePrint(node->rightSibling);
 }
