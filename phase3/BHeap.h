@@ -66,6 +66,7 @@ class BHeap
     
     private:
         HeapNode* _root;
+        HeapNode* _revertNode;
         int _size;
 
         KEYTYPE _sentinel;
@@ -74,7 +75,7 @@ class BHeap
         HeapNode* unionHelper(HeapNode* H1, HeapNode* H2);
         void linkHelper(HeapNode* y, HeapNode* z);
 
-        HeapNode* Revert(HeapNode* y);
+        void revert(HeapNode* y);
 
         void recursivePrint(HeapNode* node);
 };

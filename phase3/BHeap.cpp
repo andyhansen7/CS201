@@ -10,21 +10,21 @@
 
 // Default constructor with empty heap
 BHeap::BHeap()
-    : _root(NULL), _size(0)
+    : _root(NULL), _revertNode(NULL), _size(0)
 {
 
 }
 
 // Array constructor using repeated insertion
 BHeap::BHeap(KEYTYPE k[], int s)
-    : _root(NULL), _size(0)
+    : _root(NULL), _revertNode(NULL), _size(0)
 {
     for(int i = 0; i < s; i++) insert(k[i]);
 }
 
 // Copy constructor
 BHeap::BHeap(BHeap& base)
-    : _root(NULL), _size(0)
+    : _root(NULL), _revertNode(NULL), _size(0)
 {
 
 }
@@ -50,12 +50,12 @@ KEYTYPE BHeap::peekKey()
 // Remove the minimum key of the heap and return its value
 KEYTYPE BHeap::extractMin()
 {
-    HeapNode* reverse;
+    _revertNode = NULL;
     HeapNode* t = NULL;
     HeapNode* x = _root;
 
     if(x == NULL) return _sentinel;
-    int min = x->key;
+    KEYTYPE min = x->key;
 
     HeapNode* p = x;
     while (p->rightSibling != NULL)
@@ -78,10 +78,10 @@ KEYTYPE BHeap::extractMin()
         t->rightSibling = x->rightSibling;
     if (x->child != NULL)
     {
-        reverse = Revert(x->child);
+        revert(x->child);
         (x->child)->rightSibling = NULL;
     }
-    _root = unionHelper(_root, reverse);
+    _root = unionHelper(_root, _revertNode);
     
     return min;
 }
@@ -89,17 +89,9 @@ KEYTYPE BHeap::extractMin()
 // Insert key k into the tree
 void BHeap::insert(KEYTYPE k)
 {
-    // If tree is empty, insert new node
-    if(_size == 0) {
-        HeapNode* newnode = new HeapNode(k);
-        _root = newnode;
-    }
-    // Create new empty heap, insert one element and merge
-    else {
-        BHeap* newheap = new BHeap();
-        newheap->insert(k);
-        merge(*newheap);
-    }
+    HeapNode* newnode = new HeapNode(k);
+
+    _root = unionHelper(_root, newnode);
 
     _size++;
 }
@@ -208,21 +200,17 @@ void BHeap::linkHelper(HeapNode* y, HeapNode* z)
     z->degree++;
 }
 
-HeapNode* BHeap::Revert(HeapNode* y)
+void BHeap::revert(HeapNode* y)
 {
-    HeapNode* temp;
-
     if (y->rightSibling != NULL)
     {
-        Revert(y->rightSibling);
-        (y->rightSibling)->rightSibling = y;
+        revert(y->rightSibling);
+        y->rightSibling->rightSibling = y;
     }
     else
     {
-        temp = y;
+        _revertNode = y;
     }
-
-    return temp;
 }
 
 void BHeap::recursivePrint(HeapNode* node)
