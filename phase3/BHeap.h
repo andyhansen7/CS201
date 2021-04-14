@@ -13,21 +13,30 @@ class HeapNode
 {
     public:
         HeapNode(K key)
-            : key(key),
-              degree(0),
-              parent(NULL),
-              child(NULL),
-              rightSibling(NULL)
-        {
-
-        }
+            : key(key)
+        {}
 
         K key;
-        int degree = 0;
 
         HeapNode<K>* parent = NULL;
         HeapNode<K>* child = NULL;
+        HeapNode<K>* leftSibling = NULL;
         HeapNode<K>* rightSibling = NULL;
+};
+template<typename K>
+class BinomialTree
+{
+    public:
+        BinomialTree(HeapNode<K>* node, int heapClass)
+            : root(node)
+        {}
+    
+        int heapClass = 0;
+        HeapNode<K>* root;
+
+        BinomialTree<K>* leftSibling = NULL;
+        BinomialTree<K>* rightSibling = NULL;
+
 };
 
 template<typename K>
@@ -65,17 +74,14 @@ class BHeap
         void printKey();
     
     private:
-        HeapNode<K>* _root;
-        HeapNode<K>* _revertNode;
-        int _size;
+        BinomialTree<K>* _root;
+        int _rootListSize;
 
         K _sentinel;
 
-        HeapNode<K>* mergeHelper(HeapNode<K>* H1, HeapNode<K>* H2);
-        HeapNode<K>* unionHelper(HeapNode<K>* H1, HeapNode<K>* H2);
-        void linkHelper(HeapNode<K>* y, HeapNode<K>* z);
+        void MergeRootList();
+        
+        void UpdateRoot();
 
-        void revert(HeapNode<K>* y);
-
-        void recursivePrint(HeapNode<K>* node);
+        void RecursivePrint(HeapNode<K>* temp);
 };

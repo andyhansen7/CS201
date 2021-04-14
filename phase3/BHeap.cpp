@@ -11,7 +11,7 @@
 // Default constructor with empty heap
 template<typename K>
 BHeap<K>::BHeap()
-    : _root(NULL), _revertNode(NULL), _size(0)
+    : _root(NULL), _rootListSize(0)
 {
 
 }
@@ -19,7 +19,7 @@ BHeap<K>::BHeap()
 // Array constructor using repeated insertion
 template<typename K>
 BHeap<K>::BHeap(K k[], int s)
-    : _root(NULL), _revertNode(NULL), _size(0)
+    : _root(NULL), _rootListSize(0)
 {
     for(int i = 0; i < s; i++) insert(k[i]);
 }
@@ -27,7 +27,7 @@ BHeap<K>::BHeap(K k[], int s)
 // Copy constructor
 template<typename K>
 BHeap<K>::BHeap(BHeap<K>& base)
-    : _root(NULL), _revertNode(NULL), _size(0)
+    : _root(NULL), _rootListSize(0)
 {
 
 }
@@ -50,188 +50,190 @@ BHeap<K>::~BHeap()
 template<typename K>
 K BHeap<K>::peekKey()
 {
-    return _root->key;
+    return _root->root->key;
 }
 
 // Remove the minimum key of the heap and return its value
 template<typename K>
 K BHeap<K>::extractMin()
 {
-    _revertNode = NULL;
-    HeapNode<K>* t = NULL;
-    HeapNode<K>* x = _root;
-
-    if(x == NULL) return _sentinel;
-    K min = x->key;
-
-    HeapNode<K>* p = x;
-    while (p->rightSibling != NULL)
-    {
-        if ((p->rightSibling)->key < min)
-        {
-            min = (p->rightSibling)->key;
-            t = p;
-            x = p->rightSibling;
-        }
-        p = p->rightSibling;
-    }
-    if (t == NULL && x->rightSibling == NULL)
-        _root = NULL;
-    else if (t == NULL)
-        _root = x->rightSibling;
-    else if (t->rightSibling == NULL)
-        t = NULL;
-    else
-        t->rightSibling = x->rightSibling;
-    if (x->child != NULL)
-    {
-        revert(x->child);
-        (x->child)->rightSibling = NULL;
-    }
-    _root = unionHelper(_root, _revertNode);
-    
-    return min;
+   return _root->root->key;
 }
 
 // Insert key k into the tree
 template<typename K>
 void BHeap<K>::insert(K k)
 {
+    std::cout << "Insert value " << k << " into tree" << std::endl;
+
+    // Create new node and new subtree
     HeapNode<K>* newnode = new HeapNode<K>(k);
+    BinomialTree<K>* newheap = new BinomialTree<K>(newnode, 0);
 
-    _root = unionHelper(_root, newnode);
+    //Empty tree - new heap is only binomial tree
+    if(_root == NULL) _root = newheap;
 
-    _size++;
+    // Add new heap to existing root list
+    else
+    {
+        // Add new heap to root list
+        BinomialTree<K>* temp = _root;
+        while(temp->rightSibling != NULL) temp = temp->rightSibling;
+
+        temp->rightSibling = newheap;
+        newheap->leftSibling = temp;
+        _rootListSize++;
+
+        std::cout << "Done adding new node to root list" << std::endl;
+
+        MergeRootList();
+
+        printKey();
+
+        UpdateRoot();
+
+        printKey();
+    }
+
+    _rootListSize++;
 }
 
 // Merge heap H2 into the current heap, destructively
 template<typename K>
 void BHeap<K>::merge(BHeap& H2)
 {
-    _root = mergeHelper(_root, H2._root);
+    
 }
 
 // Print the keys stored in the heap, starting with the smallest binomial tree first
 template<typename K>
 void BHeap<K>::printKey()
 {
-    std::cout << "B" << _root->degree << std::endl;
-    recursivePrint(_root);
-    std::cout << std::endl;
+    BinomialTree<K>* temp = _root;
+
+    while(temp != NULL)
+    {
+        std::cout << "B" << temp->heapClass << std::endl;
+        RecursivePrint(temp->root);
+        std::cout << std::endl;
+        temp = temp->rightSibling;
+    }
 }
 
 template<typename K>
-HeapNode<K>* BHeap<K>::mergeHelper(HeapNode<K>* H1, HeapNode<K>* H2)
+void BHeap<K>::MergeRootList()
 {
-    HeapNode<K>* newHeap;
-    HeapNode<K>* y = H1;
-    HeapNode<K>* z = H2;
+    int binaryRepresentation = 0;
 
-    if(y != NULL)
+    BinomialTree<K>* temp = _root;
+
+    while(temp != NULL)
     {
-        if(z != NULL)
+        // Entry already at position
+        if(binaryRepresentation & (1 << temp->heapClass))
         {
-            if(y->degree <= z->degree) newHeap = y;
-            else newHeap = z;
-        }
-        else newHeap = y;
-    }
-    else newHeap = z;
+            std::cout << "Merging trees of duplicate size: B" << temp->heapClass << std::endl; 
+            printKey();
 
-    while(y != NULL && z != NULL)
-    {
-        if(y->degree < z->degree) y = y->rightSibling;
-        
-        else if(y->degree == z->degree)
-        {
-            HeapNode<K>* temp = y->rightSibling;
-            y->rightSibling = z;
-            y = temp;
-        }
+            // Merge duplicate trees
+            BinomialTree<K>* otherTree = _root;
 
-        else
-        {
-            HeapNode<K>* temp = z->rightSibling;
-            z->rightSibling = y;
-            z = temp;
-        }
-    }
+            while((otherTree->heapClass != temp->heapClass) && (otherTree != temp) && (otherTree->rightSibling != NULL)) otherTree = otherTree->rightSibling;
 
-    return newHeap;
-}
+            std::cout << "temp tree is key " << temp->root->key << ", other is " << otherTree->root->key << std::endl;
 
-template<typename K>
-HeapNode<K>* BHeap<K>::unionHelper(HeapNode<K>* H1, HeapNode<K>* H2)
-{
-    HeapNode<K>* H = mergeHelper(H1, H2);
-    if(H == NULL) return H;
+            // Check if same tree
+            if(temp == otherTree) return;
 
-    HeapNode<K>* prev_x;
-    HeapNode<K>* next_x;
-    HeapNode<K>* x;
+            // Found second tree, combine trees - smaller index should be root
+            HeapNode<K>* newHeapRoot;
 
-    prev_x = NULL;
-    x = H;
-    next_x = x->rightSibling;
-
-    while(next_x != NULL)
-    {
-        if ((x->degree != next_x->degree) || ((next_x->rightSibling != NULL)
-            && (next_x->rightSibling)->degree == x->degree))
-        {
-            prev_x = x;
-            x = next_x;
-        }
-        else
-	    {
-            if (x->key <= next_x->key)
+            // Error checking
+            if(temp->heapClass != otherTree->heapClass)
             {
-                x->rightSibling = next_x->rightSibling;
-                linkHelper(next_x, x);
+                std::cout << "[Error] Merge of non-matching heap classes" << std::endl;
+                return;
             }
-            else
+
+            // Temp has smaller key, parent of other
+            if(temp->root->key < otherTree->root->key)
             {
-                if (prev_x == NULL)
-                    H = next_x;
-                else
-                    prev_x->rightSibling = next_x;
-                linkHelper(x, next_x);
-                x = next_x;
+                newHeapRoot = temp->root;
+
+                // Set children
+                HeapNode<K>* prevChild = newHeapRoot->child;
+                newHeapRoot->child = otherTree->root;
+                otherTree->root->parent = newHeapRoot;
+                otherTree->root->rightSibling = prevChild;
+                if(prevChild != NULL) prevChild->leftSibling = otherTree->root;
             }
-	    }
-        next_x = x->rightSibling;
+            // Other has smaller key, parent of temp
+            else 
+            {
+                newHeapRoot = otherTree->root;
+
+                // Set children
+                HeapNode<K>* prevChild = newHeapRoot->child;
+                newHeapRoot->child = temp->root;
+                temp->root->parent = newHeapRoot;
+                temp->root->rightSibling = prevChild;
+                if(prevChild != NULL) prevChild->leftSibling = temp->root;
+            }
+
+            // Build new tree
+            BinomialTree<K>* newtree = new BinomialTree<K>(newHeapRoot, temp->heapClass + 1);
+
+            std::cout << "Finished building new tree" << std::endl;
+
+            // Remove old trees from root list
+            if(otherTree->leftSibling != NULL) otherTree->leftSibling->rightSibling = otherTree->rightSibling;
+            else if(otherTree->rightSibling != NULL) otherTree->rightSibling->leftSibling = otherTree->leftSibling;
+
+            if(temp->leftSibling != NULL) temp->leftSibling->rightSibling = temp->rightSibling;
+            else if(temp->leftSibling != NULL) temp->rightSibling->leftSibling = temp->leftSibling;
+
+            // Update representation
+            binaryRepresentation = (binaryRepresentation ^ (1 << (temp->heapClass + 1)));
+            std::cout << "New bin rep is " << binaryRepresentation << std::endl;
+
+            _rootListSize--;
+
+            // Insert new tree into end of list
+            BinomialTree<K>* last = temp;
+            while(last->rightSibling != NULL) last = last->rightSibling;
+            last->rightSibling = newtree;
+            newtree->leftSibling = last;
+        }
+
+        // Update array
+        else 
+        {
+            binaryRepresentation = (binaryRepresentation | (1 << temp->heapClass));
+
+            std::cout << "Binary rep now contains tree B" << temp->heapClass << std::endl;
+        }
+
+        temp = temp->rightSibling;
     }
-    return H;
 }
 
 template<typename K>
-void BHeap<K>::linkHelper(HeapNode<K>* y, HeapNode<K>* z)
+void BHeap<K>::UpdateRoot()
 {
-    y->parent = z;
-    y->rightSibling = z->child;
-    z->child = y;
-    z->degree++;
-}
+    BinomialTree<K>* temp = _root;
 
-template<typename K>
-void BHeap<K>::revert(HeapNode<K>* y)
-{
-    if (y->rightSibling != NULL)
+    while(temp != NULL)
     {
-        revert(y->rightSibling);
-        y->rightSibling->rightSibling = y;
-    }
-    else
-    {
-        _revertNode = y;
+        if(temp->root->key < _root->root->key) _root = temp;
+
+        temp = temp->rightSibling;
     }
 }
 
 template<typename K>
-void BHeap<K>::recursivePrint(HeapNode<K>* node)
+void BHeap<K>::RecursivePrint(HeapNode<K>* temp)
 {
-    if(node->rightSibling != NULL) recursivePrint(node->rightSibling);
-    std::cout << node->key << " ";
-    if(node->child != NULL) recursivePrint(node->child);
-    //if(node->rightSibling != NULL) recursivePrint(node->rightSibling);
+    std::cout << temp->key << " ";
+    if(temp->child != NULL) RecursivePrint(temp->child);
+    if(temp->rightSibling != NULL) RecursivePrint(temp->rightSibling);
 }

@@ -25,28 +25,40 @@ class LongestSequence
                 }
             } 
 
-            std::cout << "LCS: " << L[lM][lN] << std::endl;
+            std::cout << "LCS: " << L[lM][lN] << std::endl << std::endl;
+
+            // Print top row
+            std::cout << "   ";
+            for(int i = 0; i <= lN; i++) std::cout << i << '\t';
+            std::cout << std::endl;
 
             // Print array
             for(int j = 0; j <= lM; j++)
             {
+                std::cout << j << "  ";
+
                 for(int k = 0; k <= lN; k++)
                 {
                     std::cout << L[j][k] << '\t';
                 }
+
+                if(j>0) std::cout << M[j-1];
+
                 std::cout << std::endl;
             }
 
-            std::cout << std::endl;
+            std::cout << "   \t";
+            for(int i = 0; i < lN; i++) std::cout << N[i] << '\t';
+            std::cout << std::endl << std::endl;
         }
 };
 
 int main()
 {
-    char* m = "bdacbea";
-    int lm = 7;
-    char* n = "dcbaecba";
-    int ln = 8;
+    char* m = "abbcba";
+    int lm = 6;
+    char* n = "cbabca";
+    int ln = 6;
 
     LongestSequence seq(m, lm, n, ln);
 

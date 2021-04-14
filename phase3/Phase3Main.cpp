@@ -37,18 +37,18 @@ int main(){
 	C.printKey();
 	D.printKey();
 	*/
-	BHeap<int> x;
-	for(int i = 1; i < 4; i++) x.insert(i);
+	/*BHeap<int> x;
+	for(int i = 1; i < 9; i++) x.insert(i);
 	x.printKey();
 
 	//cout << x.extractMin() << endl;
 	//x.printKey();
 
-	cout << x.peekKey() << endl;
+	cout << x.peekKey() << endl;*/
 	
 
-	/*
-	BHeap<string> X(A,10), Y;
+	
+	BHeap<string> X(A,10);//, Y;
 
 	X.printKey();
 	//Should output 
@@ -58,6 +58,7 @@ int main(){
 	//B3
 	//A E H I F C D B
 
+	/*
 	cout << X.extractMin() << endl;
 	//Should output A
 	

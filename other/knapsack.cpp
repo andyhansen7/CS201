@@ -88,9 +88,9 @@ class Knapsack
 int main()
 {
     int n = 4;
-    int P[n] = { 0, 12, 15, 16, 18};
-    int W[n] = { 0, 2, 3, 4, 6};
-    int M = 8;
+    int P[5] = { 0, 2, 5, 3, 8};
+    int W[5] = { 0, 1, 2, 1, 3};
+    int M = 4;
 
     Knapsack k(P, W, n, M);
 
