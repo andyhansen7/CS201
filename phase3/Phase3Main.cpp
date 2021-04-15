@@ -7,7 +7,7 @@ using namespace std;
 
 int main(){
 	string A[10] = {"A","B","C","D","E","F","H","I","J","K"};
-	int B[10] = {10,9,8,7,6,5,4,3,2,1};
+	//int B[10] = {10,9,8,7,6,5,4,3,2,1};
 	
 	/*
 	Heap<int> T1, T2(B,10);
@@ -48,7 +48,6 @@ int main(){
 	cout << x.peekKey() << endl;*/
 	
 
-	
 	BHeap<string> X(A,10), Y;
 
 	X.printKey();
@@ -61,7 +60,7 @@ int main(){
 
 	cout << X.extractMin() << endl;
 	//Should output A
-	/*
+	
 	X.printKey();
 	//Should output
 	//B0
@@ -84,6 +83,7 @@ int main(){
 	//B2
 	//G M O N
 	
+	
 	Y.merge(X);
 	cout << Y.peekKey() << endl;
 	//Should output B
@@ -98,7 +98,13 @@ int main(){
 	//
 	//B3
 	//C E H I F J K D
-    */
+
+	BHeap<string> K(Y), L;
+	L = Y;
+
+	K.printKey();
+	L.printKey();
+    
 			
 	return 0;
 }

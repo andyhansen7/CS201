@@ -110,7 +110,7 @@ void BHeap<K>::insert(K k)
 template<typename K>
 void BHeap<K>::merge(BHeap<K>& H2)
 {
-    int size = H2.size();
+    /*int size = H2.size();
 
     for(int i = 0; i < size; i++)
     {
@@ -118,7 +118,7 @@ void BHeap<K>::merge(BHeap<K>& H2)
         //_root = UnionHelper(_root, otherRoot);
         _root = UnionHelper(_root, temp);
         //otherRoot = otherRoot->sibling;
-    }
+    }*/
 }
 
 // Print the keys stored in the heap, starting with the smallest binomial tree first
