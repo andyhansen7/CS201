@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 using namespace std;
 #include "Heap.cpp"
 #include "BHeap.cpp"
@@ -48,7 +49,7 @@ int main(){
 	
 
 	
-	BHeap<string> X(A,10);//, Y;
+	BHeap<string> X(A,10), Y;
 
 	X.printKey();
 	//Should output 
@@ -58,10 +59,9 @@ int main(){
 	//B3
 	//A E H I F C D B
 
-	/*
 	cout << X.extractMin() << endl;
 	//Should output A
-	
+	/*
 	X.printKey();
 	//Should output
 	//B0

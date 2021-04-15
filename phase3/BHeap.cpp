@@ -11,25 +11,27 @@
 // Default constructor with empty heap
 template<typename K>
 BHeap<K>::BHeap()
-    : _root(NULL), _rootListSize(0)
+    : _root(NULL)
 {
-
+    _rootList = new std::vector<BinomialTree<K>*>();
 }
 
 // Array constructor using repeated insertion
 template<typename K>
 BHeap<K>::BHeap(K k[], int s)
-    : _root(NULL), _rootListSize(0)
+    : _root(NULL)
 {
+    _rootList = new std::vector<BinomialTree<K>*>();
+
     for(int i = 0; i < s; i++) insert(k[i]);
 }
 
 // Copy constructor
 template<typename K>
 BHeap<K>::BHeap(BHeap<K>& base)
-    : _root(NULL), _rootListSize(0)
+    : _root(NULL)
 {
-
+    _rootList = new std::vector<BinomialTree<K>*>();
 }
 
 // Copy assignment operator
@@ -50,52 +52,44 @@ BHeap<K>::~BHeap()
 template<typename K>
 K BHeap<K>::peekKey()
 {
-    return _root->root->key;
+    return _root->array->operator[](0);
 }
 
 // Remove the minimum key of the heap and return its value
 template<typename K>
 K BHeap<K>::extractMin()
 {
-   return _root->root->key;
+   return _root->array->operator[](0);
 }
 
 // Insert key k into the tree
 template<typename K>
 void BHeap<K>::insert(K k)
 {
-    std::cout << "Insert value " << k << " into tree" << std::endl;
+    //std::cout << "Insert value " << k << " into tree" << std::endl;
 
     // Create new node and new subtree
-    HeapNode<K>* newnode = new HeapNode<K>(k);
-    BinomialTree<K>* newheap = new BinomialTree<K>(newnode, 0);
+    BinomialTree<K>* newtree = new BinomialTree<K>(0);
+    newtree->array->AddFront(k);
 
     //Empty tree - new heap is only binomial tree
-    if(_root == NULL) _root = newheap;
+    //if(_root == NULL) _root = newheap;
+    if(_rootList->size() == 0)
+    {
+        _rootList->push_back(newtree);
+        _root = newtree;
+    }
 
     // Add new heap to existing root list
     else
     {
         // Add new heap to root list
-        BinomialTree<K>* temp = _root;
-        while(temp->rightSibling != NULL) temp = temp->rightSibling;
-
-        temp->rightSibling = newheap;
-        newheap->leftSibling = temp;
-        _rootListSize++;
-
-        std::cout << "Done adding new node to root list" << std::endl;
+        _rootList->push_back(newtree);
 
         MergeRootList();
 
-        printKey();
-
         UpdateRoot();
-
-        printKey();
     }
-
-    _rootListSize++;
 }
 
 // Merge heap H2 into the current heap, destructively
@@ -109,14 +103,15 @@ void BHeap<K>::merge(BHeap& H2)
 template<typename K>
 void BHeap<K>::printKey()
 {
-    BinomialTree<K>* temp = _root;
+    
+    // Sort root list in ascending order
+    UpdateRoot();
 
-    while(temp != NULL)
+    for(int i = _rootList->size() - 1; i >= 0; i--)
     {
-        std::cout << "B" << temp->heapClass << std::endl;
-        RecursivePrint(temp->root);
-        std::cout << std::endl;
-        temp = temp->rightSibling;
+        std::cout << "B" << _rootList->at(i)->heapClass << std::endl;
+        _rootList->at(i)->PrintTree();
+        std::cout << std::endl << std::endl;
     }
 }
 
@@ -124,26 +119,77 @@ template<typename K>
 void BHeap<K>::MergeRootList()
 {
     int binaryRepresentation = 0;
+    unsigned int numRoots = _rootList->size();
 
-    BinomialTree<K>* temp = _root;
-
-    while(temp != NULL)
+    for(unsigned int i = 0; i < numRoots; i++)
     {
+        // Get current tree in list
+        BinomialTree<K>* currentTree = _rootList->at(i);
+
+        // Check for duplicate tree - if duplicate, merge trees
+        if(binaryRepresentation & (1 << currentTree->heapClass))
+        {
+            // Find other instance of tree with same size
+            for(unsigned int j = 0; j < i; j++)
+            {
+                // Match found
+                if(_rootList->at(j)->heapClass == currentTree->heapClass)
+                {
+                    BinomialTree<K>* mergedTrees = currentTree->MergeTrees(currentTree, _rootList->at(j));
+
+                    _rootList->erase(_rootList->begin() + i);
+                    _rootList->erase(_rootList->begin() + j);
+
+                    _rootList->push_back(mergedTrees);
+
+
+                    // Recurse and return
+                    MergeRootList();
+                    return;
+                }
+            }
+        }
+
+        // Not already in representation - add to representation and continue
+        else
+        {
+            binaryRepresentation = (binaryRepresentation | (1 << currentTree->heapClass));
+        }
+    }
+}
+/*{
+    int binaryRepresentation = 0;
+    unsigned int numRoots = _rootList->size();
+
+    unsigned int tempIndex = 0;
+    unsigned int otherIndex = 0;
+
+    for(unsigned int i = 0; i < numRoots; i++)
+    {
+        BinomialTree<K>* temp = _rootList->at(i);
+
+        tempIndex = i;
+
         // Entry already at position
         if(binaryRepresentation & (1 << temp->heapClass))
         {
-            std::cout << "Merging trees of duplicate size: B" << temp->heapClass << std::endl; 
-            printKey();
+            //std::cout << "Merging trees of duplicate size: B" << temp->heapClass << std::endl; 
+            //printKey();
 
             // Merge duplicate trees
-            BinomialTree<K>* otherTree = _root;
+            BinomialTree<K>* otherTree = _rootList->at(0);
 
-            while((otherTree->heapClass != temp->heapClass) && (otherTree != temp) && (otherTree->rightSibling != NULL)) otherTree = otherTree->rightSibling;
+            for(unsigned int j = 0; j < tempIndex; j++)
+            {
+                if(otherTree->heapClass == temp->heapClass) otherTree = _rootList->at(j);
+                otherIndex = j;
+            }
 
-            std::cout << "temp tree is key " << temp->root->key << ", other is " << otherTree->root->key << std::endl;
+            // Make sure we're not trying to merge the same tree
+            if(tempIndex == otherIndex) break;
 
-            // Check if same tree
-            if(temp == otherTree) return;
+            //std::cout << "temp tree is key " << temp->root->key << ", other is " << otherTree->root->key << std::endl;
+            //std::cout << "INDICES " << tempIndex << " " << otherIndex << " " << _rootList->size() << std::endl;
 
             // Found second tree, combine trees - smaller index should be root
             HeapNode<K>* newHeapRoot;
@@ -183,26 +229,16 @@ void BHeap<K>::MergeRootList()
             // Build new tree
             BinomialTree<K>* newtree = new BinomialTree<K>(newHeapRoot, temp->heapClass + 1);
 
-            std::cout << "Finished building new tree" << std::endl;
-
             // Remove old trees from root list
-            if(otherTree->leftSibling != NULL) otherTree->leftSibling->rightSibling = otherTree->rightSibling;
-            else if(otherTree->rightSibling != NULL) otherTree->rightSibling->leftSibling = otherTree->leftSibling;
-
-            if(temp->leftSibling != NULL) temp->leftSibling->rightSibling = temp->rightSibling;
-            else if(temp->leftSibling != NULL) temp->rightSibling->leftSibling = temp->leftSibling;
+            _rootList->erase(_rootList->begin() + otherIndex);
+            _rootList->erase(_rootList->begin() + tempIndex);
 
             // Update representation
-            binaryRepresentation = (binaryRepresentation ^ (1 << (temp->heapClass + 1)));
+            binaryRepresentation++;// = (binaryRepresentation ^ (1 << (temp->heapClass + 1)));
             std::cout << "New bin rep is " << binaryRepresentation << std::endl;
 
-            _rootListSize--;
-
             // Insert new tree into end of list
-            BinomialTree<K>* last = temp;
-            while(last->rightSibling != NULL) last = last->rightSibling;
-            last->rightSibling = newtree;
-            newtree->leftSibling = last;
+            _rootList->push_back(newtree);
         }
 
         // Update array
@@ -210,30 +246,15 @@ void BHeap<K>::MergeRootList()
         {
             binaryRepresentation = (binaryRepresentation | (1 << temp->heapClass));
 
-            std::cout << "Binary rep now contains tree B" << temp->heapClass << std::endl;
+            //std::cout << "Binary rep now contains tree B" << temp->heapClass << std::endl;
         }
-
-        temp = temp->rightSibling;
     }
-}
+}*/
 
 template<typename K>
 void BHeap<K>::UpdateRoot()
 {
-    BinomialTree<K>* temp = _root;
+    std::sort(_rootList->begin(), _rootList->end());
 
-    while(temp != NULL)
-    {
-        if(temp->root->key < _root->root->key) _root = temp;
-
-        temp = temp->rightSibling;
-    }
-}
-
-template<typename K>
-void BHeap<K>::RecursivePrint(HeapNode<K>* temp)
-{
-    std::cout << temp->key << " ";
-    if(temp->child != NULL) RecursivePrint(temp->child);
-    if(temp->rightSibling != NULL) RecursivePrint(temp->rightSibling);
+    _root = _rootList->at(0);
 }

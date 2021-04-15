@@ -6,9 +6,15 @@
  * ===========================
  */
 
-#include <iostream>
+#ifndef _BHEAP_HPP_
+#define _BHEAP_HPP_
 
-template<typename K>
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include "CDA.h"
+
+/*template<typename K>
 class HeapNode
 {
     public:
@@ -23,6 +29,7 @@ class HeapNode
         HeapNode<K>* leftSibling = NULL;
         HeapNode<K>* rightSibling = NULL;
 };
+
 template<typename K>
 class BinomialTree
 {
@@ -30,6 +37,28 @@ class BinomialTree
         BinomialTree(HeapNode<K>* node, int heapClass)
             : root(node)
         {}
+
+        // Destructively merge 2 binomial trees
+        BinomialTree<K>* MergeTrees(BinomialTree<K>* first, BinomialTree<K>* second)
+        {
+            BinomialTree<K>* newtree;
+
+            // First will become new root
+            if(first->root->key < second->root->key)
+            {
+                // Create new tree
+                newtree = new BinomialTree<K>(first->root, first->heapClass + 1);
+
+                // Move children around
+                HeapNode<K>* oldChild = newtree->root->child;
+                newtree->root->child = second->root;
+            }
+            // Second will become new root
+            else 
+            {
+
+            }
+        }
     
         int heapClass = 0;
         HeapNode<K>* root;
@@ -37,6 +66,79 @@ class BinomialTree
         BinomialTree<K>* leftSibling = NULL;
         BinomialTree<K>* rightSibling = NULL;
 
+};*/
+
+template<typename K>
+class BinomialTree
+{
+    public:
+        BinomialTree(int heapClass)
+            : heapClass(heapClass)
+        {
+            array = new CDA<K>();
+        }
+        ~BinomialTree()
+        {
+            delete array;
+        }
+
+        bool operator<(const BinomialTree<K>& other) const 
+        {
+            return heapClass < other.heapClass;
+        }
+
+        BinomialTree<K>* MergeTrees(BinomialTree<K>* first, BinomialTree<K>* second)
+        {
+            if(first->heapClass != second->heapClass) return NULL;
+
+            BinomialTree<K>* newtree;
+
+            // First will become new root
+            if(first->array->operator[](0) < second->array->operator[](0))
+            {
+                // Create new tree
+                newtree = new BinomialTree<K>(first->heapClass + 1);
+
+                // Insert children
+                for(int i = 0; i < first->array->Length(); i++) newtree->array->AddEnd(first->array->operator[](i));
+                for(int i = 0; i < second->array->Length(); i++) newtree->array->AddEnd(second->array->operator[](i));
+            }
+            // Second will become new root
+            else 
+            {
+                // Create new tree
+                newtree = new BinomialTree<K>(second->heapClass + 1);
+
+                // Insert children
+                for(int i = 0; i < second->array->Length(); i++) newtree->array->AddEnd(second->array->operator[](i));
+                for(int i = 0; i < first->array->Length(); i++) newtree->array->AddEnd(first->array->operator[](i));
+            }
+
+            return newtree;
+        }
+
+        void PrintTree()
+        {
+            std::cout << array->operator[](0) << " ";
+
+            int arrayLength = array->Length();
+
+            // Print sub trees
+            for(int i = heapClass - 1; i >= 0; i--)
+            {
+                BinomialTree<K> temp(i);
+                int halfLength = arrayLength / 2;
+                for(int j = 0; j < halfLength; j++) temp.array->AddEnd(array->operator[](halfLength + j));
+                temp.PrintTree();
+                arrayLength /= 2;
+            }
+        }
+
+        // Class of heap
+        int heapClass = 0;
+    
+        // Array for children
+        CDA<K>* array;
 };
 
 template<typename K>
@@ -75,7 +177,9 @@ class BHeap
     
     private:
         BinomialTree<K>* _root;
-        int _rootListSize;
+        //BinomialTree<K>* _lastRoot;
+        //int _rootListSize;
+        std::vector<BinomialTree<K>*>* _rootList;
 
         K _sentinel;
 
@@ -83,5 +187,7 @@ class BHeap
         
         void UpdateRoot();
 
-        void RecursivePrint(HeapNode<K>* temp);
+        //void RecursivePrint(HeapNode<K>* temp);
 };
+
+#endif // !_BHEAP_HPP_
