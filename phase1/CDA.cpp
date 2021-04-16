@@ -6,12 +6,13 @@
  * ===========================
  */
 
+
+#ifndef __CDA_CPP__
+#define __CDA_CPP__
+
 #include "CDA.h"
 #include <iostream>
 #include <stdlib.h>
-//#include <string>
-
-//#define _DEBUG_
 
 template<typename T>
 CDA<T>::CDA()
@@ -475,3 +476,5 @@ void CDA<T>::DebugLog(std::string s)
     std::cout << "> " << s << std::endl;
     #endif
 }
+
+#endif // !__CDA_CPP__

@@ -114,4 +114,4 @@ class CDA
         void DebugLog(std::string s);
  };
 
-#endif
+#endif // !__CDA_H__
