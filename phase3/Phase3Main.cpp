@@ -7,9 +7,9 @@ using namespace std;
 
 int main(){
 	string A[10] = {"A","B","C","D","E","F","H","I","J","K"};
-	//int B[10] = {10,9,8,7,6,5,4,3,2,1};
+	int B[10] = {10,9,8,7,6,5,4,3,2,1};
 	
-	/*
+	
 	Heap<int> T1, T2(B,10);
 	
 	T2.printKey();
@@ -37,7 +37,7 @@ int main(){
 
 	C.printKey();
 	D.printKey();
-	*/
+	
 	/*BHeap<int> x;
 	for(int i = 1; i < 9; i++) x.insert(i);
 	x.printKey();

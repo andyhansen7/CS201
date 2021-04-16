@@ -6,8 +6,8 @@
  * ===========================
  */
 
-#ifndef _HEAP_H_
-#define _HEAP_H_
+#ifndef __HEAP_H__
+#define __HEAP_H__
 
 #include <iostream>
 #include <cmath>
@@ -79,4 +79,4 @@ class Heap
 
         void TopDownBuildHeap();
 };
-#endif // !_HEAP_H_
+#endif // !__HEAP_H__

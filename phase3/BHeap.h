@@ -6,13 +6,13 @@
  * ===========================
  */
 
-#ifndef _BHEAP_HPP_
-#define _BHEAP_HPP_
+#ifndef __BHEAP_HPP__
+#define __BHEAP_HPP__
 
 #include <iostream>
 #include <vector>
 #include <algorithm>
-#include "CDA.h"
+#include "CDA.cpp"
 
 template<typename K>
 class BinomialTree
@@ -136,4 +136,4 @@ class BHeap
         void UpdateMinimum();
 };
 
-#endif // !_BHEAP_HPP_
+#endif // !__BHEAP_HPP__
