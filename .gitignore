@@ -1,8 +1,8 @@
 # VS Code settings folder
-/.vscode
+.vscode/
 
 # Misc folder
-/fallsemester
+fallsemester/
 
 # Executables
 *.exe
