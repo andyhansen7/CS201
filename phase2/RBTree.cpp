@@ -6,28 +6,26 @@
  * ===========================
  */
 
+#ifndef __RBTREE_CPP__
+#define __RBTREE_CPP__
+
 #include "RBTree.h"
 
 // Default constructor
 template<typename K, typename V>
 RBTree<K, V>::RBTree()
 {
-    //std::cout << "New tree created using default constructor." << std::endl;
+    
 }
 
 // Constructor using arrays
 template<typename K, typename V>
 RBTree<K, V>::RBTree(K keys[], V values[], int s)
 {
-    //std::cout << "New tree created using array parameters." << std::endl;
-
     for(int i = 0; i < s; i++)
     {
-        //std::cout << "Inserting key " << keys[i] << ", value " << values[i] << std::endl;
-        this->insert(keys[i], values[i]);
+        insert(keys[i], values[i]);
     }
-
-    ///std::cout << "Tree creation complete." << std::endl;
 }
 
 // Traditional copy constructor
@@ -140,8 +138,6 @@ K RBTree<K, V>::select(int position)
         return _root->key;
     }
     else {
-        //SetChildrenNumbers(_root);
-
         Node<K, V>* node = RecursiveSelect(_root, position - 1);
 
         if(node != NULL) return node->key;
@@ -253,7 +249,7 @@ Node<K, V>* RBTree<K, V>::RecursiveInsert(Node<K, V>* root, Node<K, V>* newnode)
         root->rightChild = RecursiveInsert(root->rightChild, newnode); 
         root->rightChild->parent = root; 
     } 
-    // Something is fucked
+    // Error case
     else {
         //std::cout << "[ERROR] Insert called on new node with key already in tree" << std::endl;
     } 
@@ -765,7 +761,7 @@ void RBTree<K, V>::PostorderRecursive(Node<K, V>* node)
     std::cout << node->key << " ";
 }
 
-// Recursive select helper
+// Recursive helper to select a node at the specified position in the tree
 template<typename K, typename V>
 Node<K, V>* RBTree<K, V>::RecursiveSelect(Node<K, V>* current, int position)
 {
@@ -775,25 +771,24 @@ Node<K, V>* RBTree<K, V>::RecursiveSelect(Node<K, V>* current, int position)
     UpdateChildren(current->leftChild);
     UpdateChildren(current->rightChild);
 
-    int numlower = current->numLeft;// + 1;GetNodeSize(current->leftChild) + 1;
+    int numlower = current->numLeft;
 
     if(numlower > position) return RecursiveSelect(current->leftChild, position);
     else if(numlower < position) return RecursiveSelect(current->rightChild, position - numlower - 1);
     else return current;
 }
 
-// Node size helper
+// Returns the size of a node, i.e. the number of children it has plus one
 template<typename K, typename V>
 int RBTree<K, V>::GetNodeSize(Node<K, V>* node)
 {
     if(node == NULL) return 0;
 
-    //return 1 + GetNodeSize(node->leftChild) + GetNodeSize(node->rightChild);
     // New method in O(1) time
     return (1 + node->numLeft + node->numRight);
 }
 
-// Rank helper
+// Recursively finds the rank of a node with key
 template<typename K, typename V>
 int RBTree<K, V>::RecursiveRank(Node<K, V>* current, K key)
 {
@@ -804,6 +799,7 @@ int RBTree<K, V>::RecursiveRank(Node<K, V>* current, K key)
     else return GetNodeSize(current->leftChild); 
 }
 
+// Helper to update counts of children, when a node is repositioned in the tree. Non-recursive
 template<typename K, typename V>
 void RBTree<K, V>::UpdateChildren(Node<K, V>* node)
 {
@@ -815,3 +811,5 @@ void RBTree<K, V>::UpdateChildren(Node<K, V>* node)
     if(node->leftChild != NULL) node->numLeft = node->leftChild->numLeft + node->leftChild->numRight + 1;
     if(node->rightChild != NULL) node->numRight = node->rightChild->numLeft + node->rightChild->numRight + 1;
 }
+
+#endif // !__RBTREE_CPP__

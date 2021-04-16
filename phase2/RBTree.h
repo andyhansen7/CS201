@@ -6,17 +6,19 @@
  * ===========================
  */
 
-#ifndef _RBTree_H_
-#define _RBTree_H_
+#ifndef __RBTree_H__
+#define __RBTree_H__
 
 #include <iostream>
 #include <string>
 
+// Struct to make node colors more readable, instead of a boolean or integer format
 enum class NodeColor {
     RED = 0,
     BLACK
 };
 
+// Node to hold a key and value, as well as basic data about its location in the tree
 template<typename K, typename V>
 class Node {
     public:
@@ -24,8 +26,8 @@ class Node {
         V value;
 
         NodeColor color = NodeColor::RED;
-        int rank = 0;
-        int nodeSize = 0;
+
+        // Stores number of children to the left and right of the node, respectively
         int numLeft = 0;
         int numRight = 0;
 
@@ -90,8 +92,10 @@ class RBTree
         void printk(int k);
     
     private:
+        // Handle to root node of tree
         Node<K, V>* _root = NULL;
 
+        // Keeps track of the number of nodes currently in the tree
         int _size = 0;
 
         // Recursive search helper
@@ -137,21 +141,21 @@ class RBTree
         // Helper to get sibling of a node
         Node<K, V>* GetSibling(Node<K, V>* node);
         
-        // Print helpers
+        // Recursive print helpers
         void PreorderRecursive(Node<K, V>* node);
         void InorderRecursive(Node<K, V>* node);
         void PostorderRecursive(Node<K, V>* node);
 
-        // Recursive select helper
+        // Recursive helper to select a node at the specified position in the tree
         Node<K, V>* RecursiveSelect(Node<K, V>* current, int position);
 
-        // Node size helper
+        // Returns the size of a node, i.e. the number of children it has plus one
         int GetNodeSize(Node<K, V>* node);
 
-        // Rank helper
+        // Recursively finds the rank of a node with key
         int RecursiveRank(Node<K, V>* current, K key);
 
-        // Children count helper
+        // Helper to update counts of children, when a node is repositioned in the tree. Non-recursive 
         void UpdateChildren(Node<K, V>* node);
 };  
 
