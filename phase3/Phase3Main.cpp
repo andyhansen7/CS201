@@ -6,7 +6,7 @@ using namespace std;
 
 
 int main(){
-	string A[10] = {"A","B","C","D","E","F","H","I","J","K"};
+	/*string A[10] = {"A","B","C","D","E","F","H","I","J","K"};
 	int B[10] = {10,9,8,7,6,5,4,3,2,1};
 	
 	
@@ -38,14 +38,14 @@ int main(){
 	C.printKey();
 	D.printKey();
 	
-	/*BHeap<int> x;
+	BHeap<int> x;
 	for(int i = 1; i < 9; i++) x.insert(i);
 	x.printKey();
 
 	//cout << x.extractMin() << endl;
 	//x.printKey();
 
-	cout << x.peekKey() << endl;*/
+	cout << x.peekKey() << endl;
 	
 
 	BHeap<string> X(A,10), Y;
@@ -103,8 +103,55 @@ int main(){
 	L = Y;
 
 	K.printKey();
-	L.printKey();
+	L.printKey();*/
+
+	// LARGE SIZE TESTS
+	std::cout << "Large heap test:" << std::endl;
+	Heap<int> A;
+
+	for(int i = 0; i < 1000000; i++) A.insert(i);
+
+	int errors = 0;
+
+	for(int i = 0; i < 1000000; i++) 
+	{
+		if(A.peekKey() != i)
+		{
+			std::cout << "Error in peekKey" << std::endl;
+			errors++;
+		}
+
+		if(A.extractMin() != i)
+		{
+			std::cout << "Error in extractMin" << std::endl;
+			errors++;
+		}
+	}
+
+	std::cout << "Total errors: " << errors << std::endl;
+	errors = 0;
+
+	std::cout << "Large binomial heap test:" << std::endl;
+	BHeap<int> B;
+
+	for(int i = 0; i < 1000000; i++) B.insert(i);
+
+	for(int i = 0; i < 1000000; i++) 
+	{
+		if(B.peekKey() != i)
+		{
+			std::cout << "Error in peekKey" << std::endl;
+			errors++;
+		}
+
+		if(B.extractMin() != i)
+		{
+			std::cout << "Error in extractMin" << std::endl;
+			errors++;
+		}
+	}
+
+	std::cout << "Total errors: " << errors << std::endl;
     
-			
 	return 0;
 }

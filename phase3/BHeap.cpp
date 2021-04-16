@@ -6,6 +6,9 @@
  * ===========================
  */
 
+#ifndef __BHEAP_CPP__
+#define __BHEAP_CPP__
+
 #include "BHeap.h"
 
 // Default constructor with empty heap
@@ -225,3 +228,5 @@ void BHeap<K>::UpdateMinimum()
         if(i == 0 || _rootList->at(i)->array->operator[](0) < _rootList->at(_minIndex)->array->operator[](0)) _minIndex = i;
     }
 }
+
+#endif // !__BHEAP_CPP__

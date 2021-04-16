@@ -6,6 +6,9 @@
  * ===========================
  */
 
+#ifndef __HEAP_CPP__
+#define __HEAP_CPP__
+
 #include "Heap.h"
 
 // Default constructor
@@ -28,6 +31,7 @@ Heap<K>::Heap(K k[], int s)
         _array->AddEnd(k[i]);
     }
 
+    // Create heap order from unordered list
     TopDownBuildHeap();
 }
 
@@ -88,13 +92,15 @@ K Heap<K>::extractMin()
     // All other cases
     else {
         K min = (_array->operator[](0));
-        //_array->operator[](0) = _array->operator[](_size - 1);
         K newMin = (_array->operator[](_size - 1));
+
+        // Remove old min from front and sap it with new min
         _array->DelFront();
         _array->DelEnd();
         _array->AddFront(newMin);
         _size--;
 
+        // Restore heap order violations
         ReHeapify(0);
 
         return min;
@@ -107,7 +113,7 @@ void Heap<K>::insert(K k)
 {
     _array->AddEnd(k);
 
-    // Swim up
+    // Swim up new node from bottom
     SwimUp(_size);
 
     _size++;
@@ -125,7 +131,7 @@ void Heap<K>::printKey()
     std::cout << std::endl;
 }
 
-// Helper to swim up or down
+// Helper to swim node up after insertion
 template<typename K>
 void Heap<K>::SwimUp(int startIndex)
 {
@@ -133,7 +139,7 @@ void Heap<K>::SwimUp(int startIndex)
 
     while(i > 0 && ( _array->operator[](GetParentIndex(i)) > _array->operator[](i) ) )
     {
-        // Swap values
+        // Swap values of i and its parent
         K temp = _array->operator[](i);
         _array->operator[](i) = _array->operator[](GetParentIndex(i));
         _array->operator[](GetParentIndex(i)) = temp;
@@ -153,7 +159,9 @@ void Heap<K>::ReHeapify(int index)
     if(leftChild < _array->Length() && _array->operator[](leftChild) < _array->operator[](index)) min = leftChild;
     if(rightChild < _array->Length() && _array->operator[](rightChild) < _array->operator[](min)) min = rightChild;
 
-    if(min != index) {
+    if(min != index) 
+    {
+        // Swap values of min and index
         K temp = _array->operator[](index);
         _array->operator[](index) = _array->operator[](min);
         _array->operator[](min) = temp;
@@ -162,66 +170,7 @@ void Heap<K>::ReHeapify(int index)
     }
 }
 
-// Restore heap order during construction
-template<typename K>
-void Heap<K>::TopDownReHeapify(int index)
-{
-    // Check if leaf node
-    if(GetLeftChildIndex(index) >= _size) return;
-
-    // Create indices
-    int leftChild = GetLeftChildIndex(index);
-    int rightChild = GetRightChildIndex(index);
-    int min;
-
-    // Heap order violation
-    if(_array->operator[](leftChild) < _array->operator[](index) || _array->operator[](rightChild) < _array->operator[](index))
-    {
-        // Swap with lesser child
-        if(_array->operator[](leftChild) < _array->operator[](rightChild)) min = leftChild;
-        else min = rightChild;
-
-        K temp = _array->operator[](index);
-        _array->operator[](index) = _array->operator[](min);
-        _array->operator[](min) = temp;
-
-        // Recursive call
-        if(min == leftChild) TopDownReHeapify(leftChild);
-        else TopDownReHeapify(rightChild);
-    }
-
-    // No violation
-    else
-    {
-        // Done
-        if(index == 0) return;
-
-        // Recursive call on parent
-        else TopDownReHeapify(GetParentIndex(index));
-    }
-}
-
-template<typename K>
-int Heap<K>::GetLowestParentDegree()
-{
-    int sum = 0;
-    int n = 0;
-
-    while(true)
-    {
-        int current = (1 << n);
-
-        if(sum + current < _size)
-        {
-            sum += current;
-            n++;
-        }
-        else break;
-    }
-
-    return n - 1;
-}
-
+// Helper to restore heap order in a top-down heap building method
 template<typename K>
 void Heap<K>::TopDownBuildHeap()
 {
@@ -229,7 +178,6 @@ void Heap<K>::TopDownBuildHeap()
 
     for(int i = _size - 1; i > 0; i--)
     {
-        //std::cout <<"i="<<i<<std::endl;
         int index = i;
         int parent = GetParentIndex(i);
         int sibling = GetSiblingIndex(i);
@@ -245,6 +193,7 @@ void Heap<K>::TopDownBuildHeap()
                 _array->operator[](sibling) = _array->operator[](parent);
                 _array->operator[](parent) = temp;
 
+                // Mark heap as changed to recurse
                 changed = true;
 
                 continue;
@@ -260,12 +209,13 @@ void Heap<K>::TopDownBuildHeap()
 
                 changed = true;
 
+                // Mark heap as changed to recurse
                 continue;
             }
         }
-
-        //printKey();
     }
 
     if(changed) TopDownBuildHeap();
 }
+
+#endif // !__HEAP_CPP__

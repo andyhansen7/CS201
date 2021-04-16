@@ -66,17 +66,13 @@ class Heap
         int GetLeftChildIndex(int index) { return (2 * index + 1); }
         int GetRightChildIndex(int index) { return (2 * index + 2); }
 
-        // Helper to swim up or down
+        // Helper to swim node up after insertion
         void SwimUp(int startIndex);
 
         // Helper to restore heap order during extract min
         void ReHeapify(int index);
 
-        // Restore heap order during construction
-        void TopDownReHeapify(int index);
-
-        int GetLowestParentDegree();
-
+        // Helper to restore heap order in a top-down heap building method
         void TopDownBuildHeap();
 };
 #endif // !__HEAP_H__
