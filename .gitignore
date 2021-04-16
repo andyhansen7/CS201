@@ -1,11 +1,17 @@
 # VS Code settings folder
 ./vscode
 
+# Misc folder
+./fallsemester
+
 # Executables
-.exe
+*.exe
 
 # Output files
-.o
+*.o
+
+# zip files
+*.zip
 
 *.json
 *.exe
