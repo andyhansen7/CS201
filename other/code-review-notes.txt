@@ -1,0 +1,71 @@
+
+Phase 1:
+
+    CDA.cpp:
+        - Definitions of functions laid out in header file
+        - #ifndef directive to prevent inclusion errors
+
+    CDA.h:
+        - Prototypes of functions 
+        _ #ifndef directive for inclusion errors 
+
+    Purpose:
+        - Create a circularly linked dynamic array with dynamic allocation for new elements
+        - Implement basic sorting functionality that creates a simple end user experience
+
+    Basic Functions:
+        - Constructor, copy constructor, copy assignment operator, array constructor using repeated inserts
+        - Destructor for memory management
+
+    [] Operator:
+        - Gives CDA similar functionality to a standard array
+        - Returns the address of the location, which means it can be used to get
+            or set the data in that location 
+
+    Other Public Functions:
+        - AddEnd / AddFront: insert on whichever end is the front, based on whether the array is reversed or not
+        - DelEnd / DeFront: remove front or end, based on if reversed 
+        - Length, capacity pretty self explanatory 
+        - Clear removes all elements in the array 
+        - Reverse just changes bool flag, no need to swap anything around 
+        - Select: entrance to recursive select function that returns the key at the position 
+        - Sort: performs a mergesort on the entire array 
+        - Search: linear search on array for element 
+        - BinSearch: performs binary search on array, assuming the array is sorted already
+        - Print: Helper function I added for testing purposes
+
+    Private members:
+        - _array: pointer to the current array 
+        - _size, _capacity 
+        - _start: the current start index of the array 
+        - _reverse: true if reversed 
+
+    Helper functions: 
+
+        - Extend: Checks if the array needs to be extended. If it does, extend it 
+        - Contract: Similar to extend. If array is too empty, shrink it 
+        - InsertFront, InsertEnd, RemoveFront, RemoveEnd: check if array needs to be expanded or contracted,
+            before carrying out operation 
+        - MergeSortSubarray: Recursive mergesort function 
+        - Merge: merges the upper and lower halves of arrays created in MergeSortSubarray
+        - BinSearchRecursive: helper to carry out binary search 
+        - QuickSelectRecursive: recursive helper for select 
+        - Partition: helper used by QuickSelectRecursive 
+        - DebugLog: printing function for debug purposes 
+
+Phase 2:
+    RBTree.cpp:
+        - Definitions of functions 
+        - #ifndef directive for inclusion errors 
+    
+    RBTree.h:
+        - Prototypes of functions 
+        - #ifndef directive for inclusion errors 
+
+    Purpose: 
+        - Create a red-black tree for efficient storage of many items, with common operations 
+
+    Basic functions: 
+        - Constructor, copy constructor, copy assignment operator, array constructor
+        - Destructor
+
