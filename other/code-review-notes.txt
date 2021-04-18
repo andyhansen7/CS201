@@ -67,5 +67,89 @@ Phase 2:
 
     Basic functions: 
         - Constructor, copy constructor, copy assignment operator, array constructor
-        - Destructor
+        - Destructor not needed 
+
+    Other public functions:
+        - Search: entry to recursive search method
+        - insert: create new node, insert recursively and recolor the tree 
+        - remove: find node recursively and delete it from the tree 
+        - rank: recursively find the rank of a node 
+        - select: use children counts to find the position desired 
+        - sucessor / predecessor: call recursive functions to get the nodes before / after 
+        - prints: entry to recursive definition 
+        - printk: call select and print on k items 
+
+    Node class:
+        - Stores key, color, value, and children/parent data neatly
+        
+    Private members:
+        - _root: handle to the root node 
+        - _size: the current size of the tree 
+
+    Helper functions:
+        - RecursiveSearch: standard binary search algorithm returning reference to a node 
+        - RecursiveInsert: modified search that find that inserts the node and updates all children counts during transversal 
+        - RecolorTree: restores red/black property violations caused during insertion, uses rotations and color swaps to restore order 
+        - GetUncle: macro to get uncle of a node 
+        - SwitchColors: macro to swap colors of 2 nodes 
+        - ShiftDown: helper to insert node_parent as parent of node. Relies on the caller to set node as child
+        - IsLeftChild: Macro to see if node is left child of its parent 
+        - LeftRotation / RightRotation: Textbook rotation procedures, plus some child count updating 
+        - GetClosest: helper to get the sucessor of a node if one exists, else the next viable replacement 
+        - Predecessor / Sucessor: get the successor / predecessor of a node, which is either the right/leftmost node in the subtree, or its ancestor 
+        - Leftmost / Rightmost: loops to get to the bottom of the tree 
+        - Delete: can simply remove the node if leaf node. If not leaf, find a replacement, swap values, and recurse on the old replacement node 
+        - FixDoubleBlack: fix double black nodes caused by deletion using rotations 
+        - GetSibling: macro to get sibling to a node 
+        - Recursive prints: recursively print the tree transversal 
+        - RecursiveSelect: update children counts while transversing, using basic select algorithm to find node at position and return it 
+        - GetNodeSize: returns the number of nodes in a subtree with root node, ie its children + 1 
+        - RecursiveRank: modification of binary search that calculates the rank of a node based on the rank of all other nodes in the transversal 
+        - UpdateChildren: updates the number of children in node based on the number of grandchildren it has 
+
+Phase 3:
+    Heap.cpp / Heap.hpp:
+        - Definiions and protoypes of functions
+        - #ifndef directive for inclusion errors 
+    Purpose:
+        - Implement standard binary heap using CDA for dynamic memory storage
+        - Use array format for simplest / fastest representation 
+    
+    - PeeekKey: return min value at index 0 of array 
+    - ExtractMin: return min value, swap with last value in array and sift it down until heap order is restored 
+    - Insert: add new element to end of array and swim it up until heap order is restored 
+    - PrintKey: print the array from start to finish, representing level order transversal 
+
+    Private members:
+        - _array, _size 
+        - Helper to get parent index, sibling index, and left/right child indices 
+        - Swimup: loop through to swap values until heap order is restored after insertion 
+        - ReHeapify: loop through to swap values until heap order is restored after an extraction 
+        - TopDownBuildHeap: Called recursively until order is restored. Starting at the bottom, create heap order in a subheap, and then recursively call if 
+            a change made affects any of the subheaps
+
+    BHeap.cpp / BHeap.hpp:
+        - Definiions and protoypes of functions
+        - #ifndef directive for inclusion errors 
+    Purpose:
+        - Implement binomial heap using a linked list of binomial trees 
+        - Utilize BinomialTree class for helpers with printing and storing keys:
+            - First half of array in tree with degree k is a k-1 tree, so is second half 
+            - Helper to merge 2 trees of the same degree and return a new tree of degree + 1
+        - Use std::vector class instead of CDA because of std::sort functionality - sort function implemented in binomial tree class 
+
+    - PeekKey: return min key of stored min tree 
+    - ExtractMin: return stored min, destruct tree into subtrees and add to root list vector 
+    - Insert: create new B0 binomial tree and add it to the root list, then merge the root list 
+    - Merge: combine root lists of trees, then merge them 
+    - PrintKey: call print on each binomial tree in the root list 
+
+    Private members:
+        - _rootList vector 
+        - _minIndex to store index of heap minimum in vector 
+
+        - MergeRootList: If 2 binomial trees with same degree are found, merge them and recurse 
+        - UpdateMinimum: use std::sort to sort the roots in order of degree, then find the root with the minimum value in the heap 
+
+    
 

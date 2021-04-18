@@ -305,8 +305,8 @@ void RBTree<K, V>::RecolorTree(Node<K, V>* newnode)
                 } 
                 else SwitchColors(parent, grandparent);
     
-            // Right-right and right-left cases
-            LeftRotation(grandparent);
+                // Right-right and right-left cases
+                LeftRotation(grandparent);
             }
         }
     }
@@ -336,7 +336,7 @@ template<typename K, typename V>
 void RBTree<K, V>::ShiftDown(Node<K, V>* node, Node<K, V>* node_parent)
 {
     if(node->parent != NULL) {
-        if (IsLeftChild(node)) node->parent->leftChild = node_parent;
+        if(IsLeftChild(node)) node->parent->leftChild = node_parent;
         else node->parent->rightChild = node_parent;
     }
 
@@ -365,17 +365,17 @@ void RBTree<K, V>::LeftRotation(Node<K, V>* node)
     // The shift
     ShiftDown(node, node_parent);
  
+    // Move children around
     node->rightChild = node_parent->leftChild;
-
     if(node_parent->leftChild != NULL) node_parent->leftChild->parent = node;
-
     node_parent->leftChild = node;
 
-    // Update children counts
+    // Update children counts for node
     UpdateChildren(node->leftChild);
     UpdateChildren(node->rightChild);
     UpdateChildren(node);
 
+    // Update children counts for node's new sibling
     Node<K, V>* temp = GetSibling(node);
     if(temp != NULL) {
         UpdateChildren(temp->leftChild);
@@ -383,9 +383,9 @@ void RBTree<K, V>::LeftRotation(Node<K, V>* node)
         UpdateChildren(temp);
     }
 
-    //UpdateChildren(node_parent->leftChild);
     UpdateChildren(node_parent->rightChild);
     
+    // Propograte children changes upward to root
     temp = node_parent;
     while(temp != NULL) {
         UpdateChildren(temp->rightChild);
@@ -408,17 +408,17 @@ void RBTree<K, V>::RightRotation(Node<K, V>* node)
     // The shift
     ShiftDown(node, node_parent);
  
+    // Move children around
     node->leftChild = node_parent->rightChild;
-
     if(node_parent->rightChild != NULL) node_parent->rightChild->parent = node;
- 
     node_parent->rightChild = node;
 
-    // Update children counts
+    // Update children counts for node
     UpdateChildren(node->leftChild);
     UpdateChildren(node->rightChild);
     UpdateChildren(node);
 
+    // Update children counts for node's new sibling
     Node<K, V>* temp = GetSibling(node);
     if(temp != NULL) {
         UpdateChildren(temp->leftChild);
@@ -427,8 +427,8 @@ void RBTree<K, V>::RightRotation(Node<K, V>* node)
     }
 
     UpdateChildren(node_parent->leftChild);
-    //UpdateChildren(node_parent->rightChild);
 
+    // Propograte children changes upward to root
     temp = node_parent;
     while(temp != NULL) {
         UpdateChildren(temp);
@@ -441,7 +441,7 @@ template<typename K, typename V>
 Node<K, V>* RBTree<K, V>::GetClosest(Node<K, V>* node)
 {
     // If node has 2 children
-    if(node->leftChild != NULL && node->rightChild != NULL) return RightmostNode(node->leftChild);//return LeftmostNode(node->rightChild);
+    if(node->leftChild != NULL && node->rightChild != NULL) return RightmostNode(node->leftChild);
  
     // If node is leaf node
     else if(node->leftChild == NULL && node->rightChild == NULL) return NULL;
