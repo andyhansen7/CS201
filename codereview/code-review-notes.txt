@@ -23,16 +23,16 @@ Phase 1:
             or set the data in that location 
 
     Other Public Functions:
-        - AddEnd / AddFront: insert on whichever end is the front, based on whether the array is reversed or not
-        - DelEnd / DeFront: remove front or end, based on if reversed 
-        - Length, capacity pretty self explanatory 
-        - Clear removes all elements in the array 
-        - Reverse just changes bool flag, no need to swap anything around 
-        - Select: entrance to recursive select function that returns the key at the position 
-        - Sort: performs a mergesort on the entire array 
-        - Search: linear search on array for element 
-        - BinSearch: performs binary search on array, assuming the array is sorted already
-        - Print: Helper function I added for testing purposes
+        - AddEnd / AddFront: insert on whichever end is the front, based on whether the array is reversed or not                                - O(1) time without restructure
+        - DelEnd / DeFront: remove front or end, based on if reversed                                                                           - O(1) time without restructure 
+        - Length, capacity pretty self explanatory                                                                                              - O(1) time 
+        - Clear removes all elements in the array                                                                                               - O(1) time 
+        - Reverse just changes bool flag, no need to swap anything around                                                                       - O(1) time 
+        - Select: entrance to recursive select function that returns the key at the position                                                    - O(n lg n) time 
+        - Sort: performs a mergesort on the entire array                                                                                        - O(n lg n) time 
+        - Search: linear search on array for element                                                                                            - O(n) time 
+        - BinSearch: performs binary search on array, assuming the array is sorted already                                                      - O(lg n) time
+        - Print: Helper function I added for testing purposes                                                                                   - O(n) time
 
     Private members:
         - _array: pointer to the current array 
@@ -42,16 +42,16 @@ Phase 1:
 
     Helper functions: 
 
-        - Extend: Checks if the array needs to be extended. If it does, extend it 
-        - Contract: Similar to extend. If array is too empty, shrink it 
-        - InsertFront, InsertEnd, RemoveFront, RemoveEnd: check if array needs to be expanded or contracted,
+        - Extend: Checks if the array needs to be extended. If it does, extend it                                                               - O(n) time, O(1) amortized
+        - Contract: Similar to extend. If array is too empty, shrink it                                                                         - O(n) time, O(1) amortized 
+        - InsertFront, InsertEnd, RemoveFront, RemoveEnd: check if array needs to be expanded or contracted,                                    - O(1) time without restructure 
             before carrying out operation 
-        - MergeSortSubarray: Recursive mergesort function 
-        - Merge: merges the upper and lower halves of arrays created in MergeSortSubarray
-        - BinSearchRecursive: helper to carry out binary search 
-        - QuickSelectRecursive: recursive helper for select 
-        - Partition: helper used by QuickSelectRecursive 
-        - DebugLog: printing function for debug purposes 
+        - MergeSortSubarray: Recursive mergesort function                                                                                       - O(n lg n) time 
+        - Merge: merges the upper and lower halves of arrays created in MergeSortSubarray                                                       - O(n) time 
+        - BinSearchRecursive: helper to carry out binary search                                                                                 - O(lg n) time 
+        - QuickSelectRecursive: recursive helper for select                                                                                     - O(n) average 
+        - Partition: helper used by QuickSelectRecursive                                                                                        - O(upper - lower)
+        - DebugLog: printing function for debug purposes                                                                                        - O(1)
 
 Phase 2:
     RBTree.cpp:
@@ -70,14 +70,14 @@ Phase 2:
         - Destructor not needed 
 
     Other public functions:
-        - Search: entry to recursive search method
-        - insert: create new node, insert recursively and recolor the tree 
-        - remove: find node recursively and delete it from the tree 
-        - rank: recursively find the rank of a node 
-        - select: use children counts to find the position desired 
-        - sucessor / predecessor: call recursive functions to get the nodes before / after 
-        - prints: entry to recursive definition 
-        - printk: call select and print on k items 
+        - search: entry to recursive search method                                                                                              - O(lg n)
+        - insert: create new node, insert recursively and recolor the tree                                                                      - O(lg n)
+        - remove: find node recursively and delete it from the tree                                                                             - O(lg n)
+        - rank: recursively find the rank of a node                                                                                             - O(lg n)
+        - select: use children counts to find the position desired                                                                              - O(lg n)
+        - sucessor / predecessor: call recursive functions to get the nodes before / after                                                      - O(lg n)
+        - prints: entry to recursive definition                                                                                                 - O(n)
+        - printk: call select and print on k items                                                                                              - O(lg k)    
 
     Node class:
         - Stores key, color, value, and children/parent data neatly
@@ -87,25 +87,28 @@ Phase 2:
         - _size: the current size of the tree 
 
     Helper functions:
-        - RecursiveSearch: standard binary search algorithm returning reference to a node 
-        - RecursiveInsert: modified search that find that inserts the node and updates all children counts during transversal 
-        - RecolorTree: restores red/black property violations caused during insertion, uses rotations and color swaps to restore order 
-        - GetUncle: macro to get uncle of a node 
-        - SwitchColors: macro to swap colors of 2 nodes 
-        - ShiftDown: helper to insert node_parent as parent of node. Relies on the caller to set node as child
-        - IsLeftChild: Macro to see if node is left child of its parent 
-        - LeftRotation / RightRotation: Textbook rotation procedures, plus some child count updating 
-        - GetClosest: helper to get the sucessor of a node if one exists, else the next viable replacement 
-        - Predecessor / Sucessor: get the successor / predecessor of a node, which is either the right/leftmost node in the subtree, or its ancestor 
-        - Leftmost / Rightmost: loops to get to the bottom of the tree 
-        - Delete: can simply remove the node if leaf node. If not leaf, find a replacement, swap values, and recurse on the old replacement node 
-        - FixDoubleBlack: fix double black nodes caused by deletion using rotations 
-        - GetSibling: macro to get sibling to a node 
-        - Recursive prints: recursively print the tree transversal 
-        - RecursiveSelect: update children counts while transversing, using basic select algorithm to find node at position and return it 
-        - GetNodeSize: returns the number of nodes in a subtree with root node, ie its children + 1 
-        - RecursiveRank: modification of binary search that calculates the rank of a node based on the rank of all other nodes in the transversal 
-        - UpdateChildren: updates the number of children in node based on the number of grandchildren it has 
+        - RecursiveSearch: standard binary search algorithm returning reference to a node                                                       - O(lg n)
+        - RecursiveInsert: modified search that find that inserts the node and updates all children counts during transversal                   - O(lg n)
+        - RecolorTree: restores red/black property violations caused during insertion, uses rotations and color swaps to restore order          - O(lg n) if called on parents all the way up to root
+        - GetUncle: macro to get uncle of a node                                                                                                - O(1)
+        - SwitchColors: macro to swap colors of 2 nodes                                                                                         - O(1)
+        - ShiftDown: helper to insert node_parent as parent of node. Relies on the caller to set node as child                                  - O(1)
+        - IsLeftChild: Macro to see if node is left child of its parent                                                                         - O(1)
+        - LeftRotation / RightRotation: Textbook rotation procedures, plus some child count updating                                            - O(1)
+        - GetClosest: helper to get the sucessor of a node if one exists, else the next viable replacement                                      - O(lg n) using loops for leftmost / rightmost 
+        - Predecessor / Sucessor: get the successor / predecessor of a node,                                                                    - O(lg n) using loops for leftmost and rightmost
+                which is either the right/leftmost node in the subtree, or its ancestor 
+        - Leftmost / Rightmost: loops to get to the bottom of the tree                                                                          - O(lg n)
+        - Delete: can simply remove the node if leaf node. If not leaf, find a replacement, swap values,                                        - O(lg n) using replacement functions and search
+                and recurse on the old replacement node 
+        - FixDoubleBlack: fix double black nodes caused by deletion using rotations                                                             - O(lg n) running all the way up to root 
+        - GetSibling: macro to get sibling to a node                                                                                            - O(1)
+        - Recursive prints: recursively print the tree transversal                                                                              - O(n) because every node is transversed
+        - RecursiveSelect: update children counts while transversing, using basic select algorithm to find node at position and return it       - O(lg n) 
+        - GetNodeSize: returns the number of nodes in a subtree with root node, ie its children + 1                                             - O(1)
+        - RecursiveRank: modification of binary search that calculates the rank of a node                                                       - O(lg n)
+                based on the rank of all other nodes in the transversal 
+        - UpdateChildren: updates the number of children in node based on the number of grandchildren it has                                    - O(1)
 
 Phase 3:
     Heap.cpp / Heap.hpp:
@@ -115,21 +118,21 @@ Phase 3:
         - Implement standard binary heap using CDA for dynamic memory storage
         - Use array format for simplest / fastest representation 
     
-    - PeeekKey: return min value at index 0 of array 
-    - ExtractMin: return min value, swap with last value in array and sift it down until heap order is restored 
-    - Insert: add new element to end of array and swim it up until heap order is restored 
-    - PrintKey: print the array from start to finish, representing level order transversal 
+    - PeeekKey: return min value at index 0 of array                                                                                            - O(1)
+    - ExtractMin: return min value, swap with last value in array and sift it down until heap order is restored                                 - O(lg n)
+    - Insert: add new element to end of array and swim it up until heap order is restored                                                       - O(lg n)
+    - PrintKey: print the array from start to finish, representing level order transversal                                                      - O(n)
 
     Private members:
         - _array, _size 
-        - Helper to get parent index, sibling index, and left/right child indices 
-        - Swimup: loop through to swap values until heap order is restored after insertion 
-        - ReHeapify: loop through to swap values until heap order is restored after an extraction 
-        - TopDownBuildHeap: Called recursively until order is restored. Starting at the bottom, create heap order in a subheap, and then recursively call if 
-            a change made affects any of the subheaps
+        - Helper to get parent index, sibling index, and left/right child indices                                                               - O(1) each
+        - Swimup: loop through to swap values until heap order is restored after insertion                                                      - O(lg n)
+        - ReHeapify: loop through to swap values until heap order is restored after an extraction                                               - O(lg n)
+        - TopDownBuildHeap: Called recursively until order is restored.                                                                         - O(n)
+            Starting at the bottom, create heap order in a subheap, and then recursively call if a change made affects any of the subheaps
 
     BHeap.cpp / BHeap.hpp:
-        - Definiions and protoypes of functions
+        - Definiions and prototypes of functions
         - #ifndef directive for inclusion errors 
     Purpose:
         - Implement binomial heap using a linked list of binomial trees 
@@ -138,18 +141,18 @@ Phase 3:
             - Helper to merge 2 trees of the same degree and return a new tree of degree + 1
         - Use std::vector class instead of CDA because of std::sort functionality - sort function implemented in binomial tree class 
 
-    - PeekKey: return min key of stored min tree 
-    - ExtractMin: return stored min, destruct tree into subtrees and add to root list vector 
-    - Insert: create new B0 binomial tree and add it to the root list, then merge the root list 
-    - Merge: combine root lists of trees, then merge them 
-    - PrintKey: call print on each binomial tree in the root list 
+    - PeekKey: return min key of stored min tree                                                                                                - O(1)
+    - ExtractMin: return stored min, destruct tree into subtrees and add to root list vector                                                    - O(lg n)
+    - Insert: create new B0 binomial tree and add it to the root list, then merge the root list                                                 - O(lg n)
+    - Merge: combine root lists of trees, then merge them                                                                                       - O(lg n)
+    - PrintKey: call print on each binomial tree in the root list                                                                               - O(n)
 
     Private members:
         - _rootList vector 
         - _minIndex to store index of heap minimum in vector 
 
-        - MergeRootList: If 2 binomial trees with same degree are found, merge them and recurse 
-        - UpdateMinimum: use std::sort to sort the roots in order of degree, then find the root with the minimum value in the heap 
+        - MergeRootList: If 2 binomial trees with same degree are found, merge them and recurse                                                 - O(lg n)
+        - UpdateMinimum: use std::sort to sort the roots in order of degree, then find the root with the minimum value in the heap              - O(lg n) because of sort
 
     
 
